@@ -3,9 +3,18 @@ BUILD_DIR=./build
 
 ##############################################
 
-.PHONY: build build_release run run_release doc pack clean
+.PHONY: build mass_storage rubber_ducky doc pack clean
 
 all: build
+
+build: $(BUILD_DIR)/Makefile
+	make -C$(BUILD_DIR) -j8
+
+mass_storage: $(BUILD_DIR)/Makefile
+	make -C$(BUILD_DIR) -j8 mass_storage
+
+rubber_ducky: $(BUILD_DIR)/Makefile
+	make -C$(BUILD_DIR) -j8 rubber_ducky
 
 doc: Doxygen
 	doxygen
@@ -19,11 +28,7 @@ clean:
 
 ##############################################
 
-build: $(BUILD_DIR)/Makefile
-	make -C$(BUILD_DIR) -j8
-
 $(BUILD_DIR)/Makefile: CMakeLists.txt ./rubber_ducky/* ./mass_storage/*
-	if [[ ! -f ./pico_sdk_import.cmake ]]; then cp ./pico-sdk/external/pico_sdk_import.cmake .; fi
-	export PICO_SDK_PATH=../pico-sdk/ && cmake -H. -B$(BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES
+	cmake -H. -B$(BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES -DPICO_SDK_PATH=pico-sdk/
 	cp $(BUILD_DIR)/compile_commands.json .
 
