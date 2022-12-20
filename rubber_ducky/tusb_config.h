@@ -37,7 +37,8 @@ extern "C"
 
 // defined by board.mk
 #ifndef CFG_TUSB_MCU
-#define CFG_TUSB_MCU OPT_MCU_RP2040
+#error "lol"
+// #define CFG_TUSB_MCU OPT_MCU_RP2040
 #endif
 
 // RHPort number used for device can be defined by board.mk, default to port 0
@@ -82,6 +83,10 @@ extern "C"
 
 #ifndef CFG_TUSB_MEM_ALIGN
 #define CFG_TUSB_MEM_ALIGN __attribute__((aligned(4)))
+#endif
+
+#ifndef CFG_TUD_ENDPOINT0_SIZE
+#define CFG_TUD_ENDPOINT0_SIZE    64
 #endif
 
 #define CFG_TUD_HID 1

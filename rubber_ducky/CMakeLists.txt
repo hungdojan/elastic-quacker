@@ -1,12 +1,26 @@
 add_executable(rubber_ducky
-    main.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.c
 )
 
 target_sources(rubber_ducky PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.c
     ${CMAKE_CURRENT_SOURCE_DIR}/usb_descriptors.c
     ${CMAKE_CURRENT_SOURCE_DIR}/usb_reports.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/error_state.c
     )
+
+# choose key sequences base on operating system
+# TODO: not working yet
+set(OS_NAME "Linux")
+if (${OS_NAME} STREQUAL "Win32")
+    target_sources(rubber_ducky PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/keyseqv/key_seqv_win.c
+        )
+else()
+    target_sources(rubber_ducky PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/keyseqv/key_seqv_linux.c
+        )
+endif()
+
 
 # include directory with tusb_config.h so that
 # TinyUSB can find it
