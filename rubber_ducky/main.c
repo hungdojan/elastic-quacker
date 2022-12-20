@@ -4,19 +4,22 @@
 #include "tusb.h"
 #include "usb_reports.h"
 
-void my_task() {
+uint32_t my_task() {
     struct key_seqv_t key_sqv;
     if (!tud_ready())
-        return;
+        return 0;
     if (!enable_key_seqv || !key_seqv_get_report(&key_sqv)) {
         tud_hid_keyboard_report(0, 0, NULL);
-        return;
+        return 0;
     }
-    sleep_ms(key_sqv.wait_before);
+
     uint8_t *keycode = key_sqv.report.keycode[0] ?
                        key_sqv.report.keycode : NULL;
-    if (tud_hid_keyboard_report(0, key_sqv.report.modifier, keycode))
+    if (tud_hid_keyboard_report(0, key_sqv.report.modifier, keycode)) {
         key_seqv_increase_counter();
+        return key_sqv.delay;
+    }
+    return 0;
 }
 
 int main(void) {
@@ -25,10 +28,12 @@ int main(void) {
     if (cyw43_arch_init())
         return 1;
 
+    uint32_t delay = 0;
     while (1) {
         // TODO: my task
         tud_task(); // tinyusb device task
-        my_task();
+        delay = my_task();
+        sleep_ms(delay);
     }
 
     return 0;

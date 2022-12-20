@@ -3,7 +3,7 @@
 #include "tusb.h"
 
 struct key_seqv_t {
-    uint32_t wait_before;
+    uint32_t delay;
     hid_keyboard_report_t report;
     bool last_item;
 };
