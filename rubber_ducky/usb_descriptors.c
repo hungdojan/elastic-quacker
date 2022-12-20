@@ -2,7 +2,7 @@
  * @brief Definition of USB and report description.
  *
  * This file defines functions used in initial exchange information with host (enumeration).
- * Some snippets of code were taken from TinyUSB examples.
+ * Some snippets of code were taken/inspired from TinyUSB examples.
  *
  * This source code serves as submission to my bachelor thesis topic
  * "Implement Rubber Duckies on Available USB Devices and Make a Practical Test"
@@ -12,12 +12,12 @@
  * @author Hung Do
  * @date 18/12/2022
  */
-#include "tusb.h"
-#include "common/tusb_types.h"
-#include "device/usbd.h"
 #include "class/hid/hid.h"          // tusb_hid_descriptor_hid_t
 #include "class/hid/hid_device.h"   // CFG_TUD_HID_EP_BUFSIZE
-#include "usb_reports.h"
+#include "common/tusb_types.h"
+#include "device/usbd.h"
+#include "tusb.h"
+#include "usb_reports.h"            // _REPORT_LENGHT
 
 #define _CONFIG_TOTAL_LENGTH (9+9+9+7)
 
@@ -149,3 +149,5 @@ uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid) {
     _desc_buffer[0] = (TUSB_DESC_STRING << 8) | (bLength * 2 + 2);
     return _desc_buffer;
 }
+
+/* usb_descriptors.c */

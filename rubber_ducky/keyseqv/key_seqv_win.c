@@ -1,4 +1,17 @@
+/**
+ * @brief Defines key sequence for Windows systems.
+ *
+ * This source code serves as submission to my bachelor thesis topic
+ * "Implement Rubber Duckies on Available USB Devices and Make a Practical Test"
+ * at FIT, BUT 2022/23.
+ *
+ * @file key_seqv_win.c
+ * @author Hung Do
+ * @date 21/12/2022
+ */
 #include "key_seqv.h"
+
+#error "Not implemented yet"
 
 static size_t key_seqv_index = 0;
 

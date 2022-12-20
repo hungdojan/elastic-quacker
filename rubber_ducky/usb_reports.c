@@ -73,22 +73,22 @@ uint16_t tud_hid_get_report_cb(uint8_t instance, uint8_t report_id,
 
     struct key_seqv_t key_sqv;
     // no other key sequence is needed to be sent
-    if (!get_next_kbc(&key_sqv))
+    if (!enable_key_seqv || !key_seqv_get_report(&key_sqv))
         return 0;
 
     // signalize error state; stop ongoing process
-    if (reqlen < sizeof(hid_keyboard_report_t)) {
+    if (reqlen < 8) {
         enter_error_state(ERR_GET_REPORT_SIZE);
     }
-    uint16_t report_size = sizeof(hid_keyboard_report_t);
+    uint16_t report_size = 8;
 
     // send a report; turn on board's LED when last item is sent
-    sleep_ms(key_sqv.wait_before);
+    sleep_ms(key_sqv.delay);
     memcpy(buffer, &(key_sqv.report), report_size);
-    if (key_sqv.last_item)
-        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, true);
+    if (!key_sqv.last_item)
+        key_seqv_increase_counter();
 
-    return sizeof(hid_keyboard_report_t);
+    return report_size;
 #else
     (void) report_type;
     (void) buffer;
@@ -110,14 +110,9 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id,
     if (report_type != HID_REPORT_TYPE_OUTPUT)
         return;
 
-    if (buffer[0] & KEYBOARD_LED_CAPSLOCK) {
-        // TODO: for debugging purposes
-        enable_key_seqv = true;
-        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
-    } else {
-        enable_key_seqv = false;
+    // reset key sequence when caps lock is turned off
+    if (!(buffer[0] & KEYBOARD_LED_CAPSLOCK)) {
         key_seqv_reset_index_counter();
-        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
     }
 }
 
@@ -128,8 +123,14 @@ void tud_hid_report_complete_cb(uint8_t instance, uint8_t const *report, uint8_t
 }
 
 void tud_mount_cb(void) {
-    UPDATE_LED(1, 500);
-    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
+    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
+    key_seqv_reset_index_counter();
+    enable_key_seqv = true;
+}
+
+void tud_resume_cb(void) {
+    key_seqv_reset_index_counter();
+    enable_key_seqv = true;
 }
 
 /* usb_reports.c */
