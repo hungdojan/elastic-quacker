@@ -7,3 +7,5 @@ pico_sdk_import.cmake
 doc/
 .ccls-cache/
 build/
+.venv/
+__pycache__/

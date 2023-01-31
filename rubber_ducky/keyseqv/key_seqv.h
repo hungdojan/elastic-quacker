@@ -13,6 +13,20 @@
 #define _KEY_SEQV_H_
 #include "tusb.h"
 
+#define TURN_OFF_KEYS(delay, last) {delay, {0, 0, {0, }}, last}
+#define KEY_SEQV(delay, modifier, keys, last) \
+    {0, {modifier, 0, keys}, false}, \
+    TURN_OFF_KEYS(delay, last)
+
+#define INITIAL_DELAY \
+    {0, {0, 0, {0, }}, false}, \
+    {350, {0, 0, {0, }}, false}, \
+    {500, {0, 0, {0, }}, false}
+
+#define LAST_ITEM {0, {0, 0, {0, }}, true}
+
+#define KEY_SEQV_BUFFER_SIZE 101
+
 /**
  * @brief Key sequence structure.
  */
@@ -21,6 +35,8 @@ struct key_seqv_t {
     hid_keyboard_report_t report;   /**< Report data */
     bool last_item;                 /**< Last item flag, items after that are ignored */
 };
+
+extern struct key_seqv_t key_seqvs[KEY_SEQV_BUFFER_SIZE];
 
 /**
  * @brief Reset key sequence index counter.

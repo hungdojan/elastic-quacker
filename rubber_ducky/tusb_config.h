@@ -37,8 +37,7 @@ extern "C"
 
 // defined by board.mk
 #ifndef CFG_TUSB_MCU
-#error "lol"
-// #define CFG_TUSB_MCU OPT_MCU_RP2040
+#define CFG_TUSB_MCU OPT_MCU_RP2040
 #endif
 
 // RHPort number used for device can be defined by board.mk, default to port 0
