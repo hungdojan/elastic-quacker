@@ -14,12 +14,23 @@
  */
 #include "class/hid/hid.h"          // tusb_hid_descriptor_hid_t
 #include "class/hid/hid_device.h"   // CFG_TUD_HID_EP_BUFSIZE
+#include "class/msc/msc.h"          // MSC_SUBCLASS_SCSI, MSC_PROTOCOL_BOT
+#include "class/msc/msc_device.h"
 #include "common/tusb_types.h"
 #include "device/usbd.h"
 #include "tusb.h"
 #include "usb_reports.h"            // _REPORT_LENGHT
 
-#define _CONFIG_TOTAL_LENGTH (9+9+9+7)
+#define _CONFIG_LEN 9
+#define _HID_LEN (9+9+7)
+#define _MSC_LEN (9+7+7)
+#define _CONFIG_TOTAL_LENGTH (_CONFIG_LEN + _HID_LEN + _MSC_LEN)
+
+enum {
+    ITF_NUM_HID,
+    ITF_NUM_MSC,
+    ITF_NUM_TOTAL
+};
 
 // device descriptor
 tusb_desc_device_t const desc_device = {
@@ -47,23 +58,25 @@ tusb_desc_configuration_t const desc_config = {
     .bLength             = 9, // can't use sizeof due to padding
     .bDescriptorType     = TUSB_DESC_CONFIGURATION,
     .wTotalLength        = _CONFIG_TOTAL_LENGTH,
-    .bNumInterfaces      = 0x01,
+    .bNumInterfaces      = ITF_NUM_TOTAL,
     .bConfigurationValue = 0x01,
     .iConfiguration      = 0x00,
     .bmAttributes        = TU_BIT(7) | TU_BIT(5) | 0x00,    // self-powered
     .bMaxPower           = 50
 };
 
-tusb_desc_interface_t const desc_interface = {
+// ===================== HID class =====================
+
+tusb_desc_interface_t const desc_itf_hid = {
     .bLength            = 9, // can't use sizeof due to padding
     .bDescriptorType    = TUSB_DESC_INTERFACE,
-    .bInterfaceNumber   = 0x00,
+    .bInterfaceNumber   = ITF_NUM_HID,
     .bAlternateSetting  = 0x00,
     .bNumEndpoints      = 0x01,
     .bInterfaceClass    = TUSB_CLASS_HID,
     .bInterfaceSubClass = 0x00,
     .bInterfaceProtocol = 0x00,
-    .iInterface         = 0x00
+    .iInterface         = 0x02
 };
 
 tusb_hid_descriptor_hid_t const desc_hid = {
@@ -76,20 +89,57 @@ tusb_hid_descriptor_hid_t const desc_hid = {
     .wReportLength      = _REPORT_LENGHT,
 };
 
-tusb_desc_endpoint_t const desc_endpoint = {
+tusb_desc_endpoint_t const desc_ep_hid = {
     .bLength            = 7, // can't use sizeof due to padding
     .bDescriptorType    = TUSB_DESC_ENDPOINT,
-    .bEndpointAddress   = 0x81,
+    .bEndpointAddress   = 0x81, // IN | INTERRUPT
     .bmAttributes       = {.xfer=TUSB_XFER_INTERRUPT},
     .wMaxPacketSize     = {.size=CFG_TUD_HID_EP_BUFSIZE},
     .bInterval          = 5,
 };
 
+// ===================== MSC class =====================
+
+tusb_desc_interface_t const desc_itf_msc = {
+    .bLength            = 9, // can't use sizeof due to padding
+    .bDescriptorType    = TUSB_DESC_INTERFACE,
+    .bInterfaceNumber   = ITF_NUM_MSC,
+    .bAlternateSetting  = 0x00,
+    .bNumEndpoints      = 0x02,
+    .bInterfaceClass    = TUSB_CLASS_MSC,
+    .bInterfaceSubClass = MSC_SUBCLASS_SCSI,
+    .bInterfaceProtocol = MSC_PROTOCOL_BOT,
+    .iInterface         = 0x03
+};
+
+tusb_desc_endpoint_t const desc_ep_msc_in = {
+    .bLength            = 7, // can't use sizeof due to padding
+    .bDescriptorType    = TUSB_DESC_ENDPOINT,
+    .bEndpointAddress   = 0x83, // IN | BULK
+    .bmAttributes       = {.xfer=TUSB_XFER_BULK},
+    .wMaxPacketSize     = {.size=U16_TO_U8S_LE(CFG_TUD_ENDPOINT0_SIZE)},
+    .bInterval          = 0,
+};
+
+tusb_desc_endpoint_t const desc_ep_msc_out = {
+    .bLength            = 7, // can't use sizeof due to padding
+    .bDescriptorType    = TUSB_DESC_ENDPOINT,
+    .bEndpointAddress   = 0x03, // OUT | BULK
+    .bmAttributes       = {.xfer=TUSB_XFER_BULK},
+    .wMaxPacketSize     = {.size=U16_TO_U8S_LE(CFG_TUD_ENDPOINT0_SIZE)},
+    .bInterval          = 0,
+};
+
+// =====================================================
+
+
 uint8_t config_buffer[_CONFIG_TOTAL_LENGTH] = { 0, };
 
 static char *string_descriptor[] = {
-    "BUT FIT",          // Manufacture
-    "Rubber Ducky"      // Product
+    "BUT FIT",                      // Manufacture
+    "Rubber Ducky",                 // Product
+    "Definitely not a keyboard",    // interface HID
+    "Just a mass storage"           // interface MSC
 };
 
 static uint16_t _desc_buffer[32] = { 0, };
@@ -107,15 +157,15 @@ uint8_t const * tud_descriptor_configuration_cb(uint8_t index) {
     offset += desc_config.bLength;
 
     // Interface descriptor
-    memcpy(config_buffer + offset, (uint8_t *)&desc_interface, desc_interface.bLength);
-    offset += desc_interface.bLength;
+    memcpy(config_buffer + offset, (uint8_t *)&desc_itf_hid, desc_itf_hid.bLength);
+    offset += desc_itf_hid.bLength;
 
     // HID descriptor
     memcpy(config_buffer + offset, (uint8_t *)&desc_hid, desc_hid.bLength);
     offset += desc_hid.bLength;
 
     // Endpoint descriptor
-    memcpy(config_buffer + offset, (uint8_t *)&desc_endpoint, desc_endpoint.bLength);
+    memcpy(config_buffer + offset, (uint8_t *)&desc_ep_hid, desc_ep_hid.bLength);
 
     return (uint8_t const *) config_buffer;
 }
