@@ -7,6 +7,7 @@ target_sources(rubber_ducky PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/usb_reports.c
     ${CMAKE_CURRENT_SOURCE_DIR}/error_state.c
     ${CMAKE_CURRENT_SOURCE_DIR}/keyseqv/key_seqv.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/msc.c
     )
 
 # choose key sequences base on operating system
