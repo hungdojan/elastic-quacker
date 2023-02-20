@@ -66,7 +66,7 @@ tusb_desc_configuration_t const desc_config = {
 };
 
 // ===================== HID class =====================
-
+// HID interface
 tusb_desc_interface_t const desc_itf_hid = {
     .bLength            = 9, // can't use sizeof due to padding
     .bDescriptorType    = TUSB_DESC_INTERFACE,
@@ -79,6 +79,7 @@ tusb_desc_interface_t const desc_itf_hid = {
     .iInterface         = 0x02
 };
 
+// HID descriptor
 tusb_hid_descriptor_hid_t const desc_hid = {
     .bLength            = 9, // can't use sizeof due to padding
     .bDescriptorType    = HID_DESC_TYPE_HID,
@@ -89,6 +90,7 @@ tusb_hid_descriptor_hid_t const desc_hid = {
     .wReportLength      = _REPORT_LENGHT,
 };
 
+// HID endpoint
 tusb_desc_endpoint_t const desc_ep_hid = {
     .bLength            = 7, // can't use sizeof due to padding
     .bDescriptorType    = TUSB_DESC_ENDPOINT,
@@ -99,7 +101,7 @@ tusb_desc_endpoint_t const desc_ep_hid = {
 };
 
 // ===================== MSC class =====================
-
+// MSC interface
 tusb_desc_interface_t const desc_itf_msc = {
     .bLength            = 9, // can't use sizeof due to padding
     .bDescriptorType    = TUSB_DESC_INTERFACE,
@@ -112,6 +114,7 @@ tusb_desc_interface_t const desc_itf_msc = {
     .iInterface         = 0x03
 };
 
+// MSC endpoint IN
 tusb_desc_endpoint_t const desc_ep_msc_in = {
     .bLength            = 7, // can't use sizeof due to padding
     .bDescriptorType    = TUSB_DESC_ENDPOINT,
@@ -121,6 +124,7 @@ tusb_desc_endpoint_t const desc_ep_msc_in = {
     .bInterval          = 0,
 };
 
+// MSC endpoint OUT
 tusb_desc_endpoint_t const desc_ep_msc_out = {
     .bLength            = 7, // can't use sizeof due to padding
     .bDescriptorType    = TUSB_DESC_ENDPOINT,
@@ -156,7 +160,7 @@ uint8_t const * tud_descriptor_configuration_cb(uint8_t index) {
     memcpy(config_buffer + offset, (uint8_t *)&desc_config, desc_config.bLength);
     offset += desc_config.bLength;
 
-    // Interface descriptor
+    // HID Interface descriptor
     memcpy(config_buffer + offset, (uint8_t *)&desc_itf_hid, desc_itf_hid.bLength);
     offset += desc_itf_hid.bLength;
 
@@ -164,8 +168,20 @@ uint8_t const * tud_descriptor_configuration_cb(uint8_t index) {
     memcpy(config_buffer + offset, (uint8_t *)&desc_hid, desc_hid.bLength);
     offset += desc_hid.bLength;
 
-    // Endpoint descriptor
+    // HID Endpoint descriptor
     memcpy(config_buffer + offset, (uint8_t *)&desc_ep_hid, desc_ep_hid.bLength);
+    offset += desc_ep_hid.bLength;
+
+    // MSC Interface descriptor
+    memcpy(config_buffer + offset, (uint8_t *)&desc_itf_msc, desc_itf_msc.bLength);
+    offset += desc_itf_msc.bLength;
+
+    // MSC Input Endpoint descriptor
+    memcpy(config_buffer + offset, (uint8_t *)&desc_ep_msc_in, desc_ep_msc_in.bLength);
+    offset += desc_ep_msc_in.bLength;
+
+    // MSC Output Endpoint descriptor
+    memcpy(config_buffer + offset, (uint8_t *)&desc_ep_msc_out, desc_ep_msc_out.bLength);
 
     return (uint8_t const *) config_buffer;
 }
