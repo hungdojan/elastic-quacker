@@ -176,12 +176,12 @@ uint8_t const * tud_descriptor_configuration_cb(uint8_t index) {
     memcpy(config_buffer + offset, (uint8_t *)&desc_itf_msc, desc_itf_msc.bLength);
     offset += desc_itf_msc.bLength;
 
-    // MSC Input Endpoint descriptor
-    memcpy(config_buffer + offset, (uint8_t *)&desc_ep_msc_in, desc_ep_msc_in.bLength);
-    offset += desc_ep_msc_in.bLength;
-
     // MSC Output Endpoint descriptor
     memcpy(config_buffer + offset, (uint8_t *)&desc_ep_msc_out, desc_ep_msc_out.bLength);
+    offset += desc_ep_msc_out.bLength;
+
+    // MSC Input Endpoint descriptor
+    memcpy(config_buffer + offset, (uint8_t *)&desc_ep_msc_in, desc_ep_msc_in.bLength);
 
     return (uint8_t const *) config_buffer;
 }

@@ -48,6 +48,10 @@ int main(void) {
     if (cyw43_arch_init())
         return 1;
 
+    // initial booting delay
+    for (int i = 0; i < 500000; i++)
+        tud_task(); // tinyusb device task
+
     // main program loop
     uint32_t delay = 0;
     while (1) {

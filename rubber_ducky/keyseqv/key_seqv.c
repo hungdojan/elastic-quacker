@@ -15,9 +15,9 @@
 /** Index of the key sequence to send */
 static size_t key_seqv_index = 0;
 /** Differentiates whether device runs hard-coded or uploaded script */
-static bool mode_static = true;
+// TODO: static bool mode_static = true;
 /** Returns number of key sequences in the buffer */
-static int key_seqv_len = -1;
+// TODO: static int key_seqv_len = -1;
 
 void key_seqv_reset_index_counter() {
     key_seqv_index = 0;
