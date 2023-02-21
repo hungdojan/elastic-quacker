@@ -11,9 +11,6 @@ Year: 2022/2023
 RubberDucky_BachelorThesis
 ├── CMakeLists.txt
 ├── Makefile
-├── mass_storage
-│   ├── CMakeLists.txt
-│   └── main.c
 ├── pico-sdk
 │   └── ...
 ├── README.md
@@ -23,9 +20,12 @@ RubberDucky_BachelorThesis
     ├── error_state.h
     ├── keyseqv
     │   ├── key_seqv.h
+    │   ├── key_seqv.c
     │   ├── key_seqv_linux.c
     │   └── key_seqv_win.c
     ├── main.c
+    ├── msc.c
+    ├── msc.h
     ├── tusb_config.h
     ├── usb_descriptors.c
     ├── usb_reports.c
