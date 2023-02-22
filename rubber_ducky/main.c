@@ -13,7 +13,7 @@
 #include "keyseqv/key_seqv.h"   // struct key_seqv_t, key_seqv_get_report
 #include "pico/cyw43_arch.h"    // cyw43_arch_init
 #include "tusb.h"
-#include "usb_reports.h"        // enable_key_seqv
+#include "usb_general.h"        // enable_key_seqv
 
 /**
  * @brief Send a key sequence using HID report.

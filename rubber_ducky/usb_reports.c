@@ -2,7 +2,7 @@
 #include "class/hid/hid.h"
 #include "keyseqv/key_seqv.h"
 #include "pico/cyw43_arch.h"
-#include "usb_reports.h"
+#include "usb_general.h"
 #include "error_state.h"
 
 bool enable_key_seqv = false;
@@ -126,11 +126,13 @@ void tud_mount_cb(void) {
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
     key_seqv_reset_index_counter();
     enable_key_seqv = true;
+    is_ejected = false;
 }
 
 void tud_resume_cb(void) {
     key_seqv_reset_index_counter();
     enable_key_seqv = true;
+    is_ejected = false;
 }
 
 /* usb_reports.c */
