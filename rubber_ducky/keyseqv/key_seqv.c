@@ -35,3 +35,5 @@ bool key_seqv_get_report(struct key_seqv_t * const report_out) {
     *report_out = key_seqvs[key_seqv_index];
     return true;
 }
+
+/* key_seqv.c */

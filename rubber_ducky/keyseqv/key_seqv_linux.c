@@ -35,4 +35,4 @@ struct key_seqv_t key_seqvs[] = {
     LAST_ITEM,
 };
 
-/* key_seqv.c */
+/* key_seqv_linux.c */

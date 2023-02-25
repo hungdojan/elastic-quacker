@@ -1,3 +1,14 @@
+/**
+ * @brief File defines important HID structures and functions.
+ *
+ * This source code serves as submission to my bachelor thesis topic
+ * "Implement Rubber Duckies on Available USB Devices and Make a Practical Test"
+ * at FIT, BUT 2022/23.
+ *
+ * @file usb_reports.c
+ * @author Hung Do
+ * @date 25/02/2023
+ */
 #include "class/hid/hid_device.h"
 #include "class/hid/hid.h"
 #include "keyseqv/key_seqv.h"

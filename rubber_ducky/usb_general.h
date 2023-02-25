@@ -27,7 +27,9 @@
 // Sense key table: https://www.seagate.com/files/staticfiles/support/docs/manual/Interface%20manuals/100293068j.pdf#G4.1602528
 // Additional sense key table: https://www.seagate.com/files/staticfiles/support/docs/manual/Interface%20manuals/100293068j.pdf#G4.1602906
 
+// USB status used by MSC; indicates if the device was connected or not
 extern bool is_ejected;
+// enables rubber ducky scripting
 extern bool enable_key_seqv;
 
 #endif // _USB_GENERAL_H_
