@@ -1,5 +1,6 @@
 *.o
 .zip
+*.log
 .ccls
 compile_commands.json
 pico_sdk_import.cmake
@@ -9,3 +10,5 @@ doc/
 build/
 .venv/
 __pycache__/
+.vscode/
+.cache/
