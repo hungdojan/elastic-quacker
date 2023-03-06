@@ -41,6 +41,7 @@ class KeySeqvParser:
         self._in_file = in_file
         self._out_file = out_file
         self._lof_keyseqvs: list[KeySeqv] = []
+        self.__new_sequence_structure()
         self._compile_patterns()
 
 
@@ -70,52 +71,78 @@ class KeySeqvParser:
             self._in_file = new_in_file
 
 
+
+    def __new_sequence_structure(self):
+        """Create a new structure for the keys."""
+        self.__ks_struct = {
+            'delay': 0,
+            'modifiers': [],
+            'keys': []
+        }
+
     def parse_line(self, line: str):
 
-        def _get_new_sequence_structure(): # -> dict[str, list[Any]|int]:
-            return {
-                'delay': 0,
-                'modifiers': [],
-                'keys': []
-            }
+        def _check_special_keys(value: str):
+            # TODO:
+            pass
 
-        ks_struct = _get_new_sequence_structure()
 
+        def _check_normal_keys(value: str):
+            # check if symbol requires shift modifier
+            if value in shift_mapping or value.isupper():
+                # new sequence
+                if not self.__ks_struct['keys']:
+                    self.__ks_struct['modifiers'].append(Modifier.LSHIFT)
+                # shift is not toggled yet push the key sequence first
+                elif Modifier.LSHIFT not in self.__ks_struct['modifiers'] and \
+                     Modifier.RSHIFT not in self.__ks_struct['modifiers']:
+                    self._lof_keyseqvs.append(KeySeqv(**self.__ks_struct))
+                    self.__new_sequence_structure()
+                    self.__ks_struct['modifiers'].append(Modifier.LSHIFT)
+                if value in shift_mapping:
+                    self.__ks_struct['keys'].append(normal_mapping[shift_mapping[value]])
+                else:
+                    self.__ks_struct['keys'].append(normal_mapping[value.lower()])
+
+            else:
+                # if shift is toggled push the key sequence first
+                if Modifier.LSHIFT in self.__ks_struct['modifiers'] or \
+                   Modifier.RSHIFT in self.__ks_struct['modifiers']:
+                    self._lof_keyseqvs.append(KeySeqv(**self.__ks_struct))
+                    self.__new_sequence_structure()
+                self.__ks_struct['keys'].append(normal_mapping[value])
+
+
+        self.__new_sequence_structure()
         matches = self._key_seqv_regex.findall(line)
-        print(matches)
-        for seqv in matches:
-            # load delay
-            if seqv[Groups.DELAY_ORIGINAL.value]:
-                if ks_struct['keys'] or ks_struct['delay']:
-                    self._lof_keyseqvs.append(KeySeqv(**ks_struct))
-                    ks_struct = _get_new_sequence_structure()
-                ks_struct['delay'] = int(seqv[Groups.DELAY_VALUE.value])
 
-                # TODO: create delay
-                pass
+        for match in matches:
+            # load delay
+            if match[Groups.DELAY_ORIGINAL.value]:
+                # finish previous sequence and add delay to the new one
+                if self.__ks_struct['keys'] or self.__ks_struct['delay']:
+                    self._lof_keyseqvs.append(KeySeqv(**self.__ks_struct))
+                    self.__new_sequence_structure()
+                self.__ks_struct['delay'] = int(match[Groups.DELAY_VALUE.value])
+
             # load special
-            elif seqv[Groups.SPECIAL_ORIGINAL.value]:
+            elif match[Groups.SPECIAL_ORIGINAL.value]:
                 # TODO: modifiers/special
                 pass
             # load normal keys
             else:
-                value: str = seqv[Groups.NORMAL_KEYS.value]
-                # check if symbol needs shift modifier
-                if value in shift_mapping or value.isupper():
-                    if ks_struct['modifier']:
-                        pass
-                    pass
-                else:
-                    ks_struct['keys'].append(normal_mapping[value])
-                if len(ks_struct['keys']) > 5:
-                    self._lof_keyseqvs.append(KeySeqv(**ks_struct))
-                    ks_struct = _get_new_sequence_structure()
-                # normal keys
-            # get max 6 keys
-            # create KeySeqv instance
-            # insert it in self._lof_keyseqvs
-        if ks_struct['keys']:
-            self._lof_keyseqvs.append(KeySeqv(**ks_struct))
+                value: str = match[Groups.NORMAL_KEYS.value]
+                _check_normal_keys(value)
+
+                # max 6 keys pressed are allowed to be sent at the same time
+                if len(self.__ks_struct['keys']) > 5:
+                    self._lof_keyseqvs.append(KeySeqv(**self.__ks_struct))
+                    self.__new_sequence_structure()
+
+        # finish last item pending (if exists)
+        if self.__ks_struct['keys']:
+            self._lof_keyseqvs.append(KeySeqv(**self.__ks_struct))
+        # set last item as last item
         if self._lof_keyseqvs:
             last_item = self._lof_keyseqvs[-1]
             last_item.last = True
@@ -128,7 +155,7 @@ class KeySeqvParser:
             # line check
             if not self._line_regex.match(line):
                 logging.warn(f'Unexpected character in line {i+1}')
-                pass
+                continue
 
             # parsing
             self.parse_line(line)
