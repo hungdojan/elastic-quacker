@@ -198,7 +198,10 @@ class KeySeqv:
         else:
             out += '0'
         out += ', 0, {'
-        out += ', '.join([k.value for k in self.keys])
+        if self.keys:
+            out += ', '.join([k.value for k in self.keys])
+        else:
+            out += '0,'
         out += '}}, '
         out += f'{"true" if self.last else "false"}}},\n'
         return out

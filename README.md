@@ -14,20 +14,30 @@ RubberDucky_BachelorThesis
 ├── pico-sdk
 │   └── ...
 ├── README.md
-└── rubber_ducky
-    ├── CMakeLists.txt
-    ├── error_state.c
-    ├── error_state.h
-    ├── keyseqv
-    │   ├── key_seqv.h
-    │   ├── key_seqv.c
-    │   ├── key_seqv_linux.c
-    │   └── key_seqv_win.c
-    ├── main.c
-    ├── msc.c
-    ├── msc.h
-    ├── tusb_config.h
-    ├── usb_descriptors.c
-    ├── usb_reports.c
-    └── usb_reports.h
+├── requirements.txt
+├── rubber_ducky
+│   ├── CMakeLists.txt
+│   ├── error_state.c
+│   ├── error_state.h
+│   ├── keyseqv
+│   │   ├── key_seqv.h
+│   │   ├── key_seqv.c
+│   │   ├── key_seqv_linux.c
+│   │   └── key_seqv_win.c
+│   ├── main.c
+│   ├── msc.c
+│   ├── msc.h
+│   ├── tusb_config.h
+│   ├── usb_descriptors.c
+│   ├── usb_reports.c
+│   └── usb_reports.h
+└── scripts
+    ├── parser-cli.py
+    └── rd_parser
+        ├── __init__.py
+        ├── error.py
+        ├── key_seqv.py
+        ├── key_seqv_parser.py
+        ├── mappings.py
+        └── regex_groups.py
 ```
