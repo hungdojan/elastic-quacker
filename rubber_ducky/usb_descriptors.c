@@ -19,7 +19,7 @@
 #include "common/tusb_types.h"
 #include "device/usbd.h"
 #include "tusb.h"
-#include "usb_reports.h"            // _REPORT_LENGHT
+#include "usb_general.h"            // _REPORT_LENGTH
 
 #define _CONFIG_LEN 9
 #define _HID_LEN (9+9+7)
@@ -87,7 +87,7 @@ tusb_hid_descriptor_hid_t const desc_hid = {
     .bCountryCode       = 0x00,
     .bNumDescriptors    = 0x01,
     .bReportType        = HID_DESC_TYPE_REPORT,
-    .wReportLength      = _REPORT_LENGHT,
+    .wReportLength      = _REPORT_LENGTH,
 };
 
 // HID endpoint
