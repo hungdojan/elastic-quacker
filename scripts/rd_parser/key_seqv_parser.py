@@ -145,23 +145,39 @@ class KeySeqvParser:
                     continue
                 used_modifiers.append(modifier_mapping[m])
 
-            # TODO: special case for shift
-            non_modifier_key: str = match[Groups.SPECIAL_KEYS.value]
-            if non_modifier_key.lower() in special_mapping:
-                pass
-            else:
-                #
-                pass
+        # TODO: special case for shift
+        non_modifier_key: str = match[Groups.SPECIAL_KEYS.value]
+        # special key (like escape or return)
+        if non_modifier_key.lower() in special_mapping:
+            self.__ks_struct['keys'].append(special_mapping[non_modifier_key.lower()])
+            self.__ks_struct['modifiers'] = used_modifiers
+            self.__push_pressed_and_released()
+            return
+        if non_modifier_key.lower() in special_key_naming:
+            # add shift if not toggled yet
+            # TODO: shift error
+            keys_info = special_key_naming[non_modifier_key.lower()]
+            if keys_info[0] and keys_info[0] not in used_modifiers:
+                used_modifiers.append(keys_info[0])
+
+            self.__ks_struct['keys'].append(keys_info[1])
+            self.__ks_struct['modifiers'] = used_modifiers
+            self.__push_pressed_and_released()
+            return
+        # can't send more than 1 keys at once
+        # TODO: implement multiple presses at the same time (max 6)
+        elif len(non_modifier_key) > 1:
+            # TODO: error
+            pass
         else:
-            # TODO: special case for shift
-            non_modifier_key: str = match[Groups.SPECIAL_KEYS.value]
-            if non_modifier_key.lower() in special_mapping:
-                pass
-            elif non_modifier_key.lower() in special_key_naming:
-                # TODO:
-                pass
-            else:
-                pass
+            # TODO: shift problem
+            if non_modifier_key in shift_mapping or non_modifier_key.isupper() and \
+               Modifier.LSHIFT not in self.__ks_struct['modifiers'] and \
+               Modifier.RSHIFT not in self.__ks_struct['modifiers']:
+                # TODO: error
+                return
+            self.__ks_struct['modifiers'] = used_modifiers
+            self.__check_normal_keys(non_modifier_key)
 
 
     def parse_line(self, line: str, line_index: int):
@@ -170,7 +186,7 @@ class KeySeqvParser:
         matches = self._key_seqv_regex.findall(line)
 
         for match in matches:
-            # hold delay
+            # TODO: hold delay
             # wait delay
             if match[Groups.DELAY_WAIT_ORIGINAL.value]:
                 # finish previous sequence and add delay to the new one
@@ -189,6 +205,9 @@ class KeySeqvParser:
 
             # load special
             if match[Groups.SPECIAL_ORIGINAL.value]:
+                # push current sequence and create it for special sequence
+                if self.__ks_struct['keys']:
+                    self.__push_pressed_and_released()
                 self.__check_special_keys(match, line_index)
 
             # load normal keys
