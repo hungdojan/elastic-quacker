@@ -15,6 +15,12 @@ modifier_mapping = {
     'rm': Modifier.RMETA,
 }
 
+special_key_naming = {
+    'lt': (Modifier.LSHIFT, Key.KEY_COMMA),
+    'gt': (Modifier.LSHIFT, Key.KEY_PERIOD)
+}
+
+
 special_mapping = {
     'enter': Key.KEY_ENTER,
     'escape': Key.KEY_ESCAPE,
