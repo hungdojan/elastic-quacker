@@ -6,10 +6,19 @@ class Groups(enum.Enum):
     SPECIAL_ORIGINAL    = 2
     SPECIAL_CONTENT     = 3
     SPECIAL_MODIFIERS   = 4
-    SPECIAL_KEYS        = 5
-    NORMAL_KEYS         = 6
+    SPECIAL_ESCAPE_EN   = 5
+    SPECIAL_KEYS_OR_ID  = 6
+    COMMENT             = 7
+    NORMAL_KEYS         = 8
 
 
 # TODO: comment
-KEY_SEQV_REGEX = r'(<DELAY (\d+)>)|(<(((?:[a-z]{1,2}-)*)([a-z\d]+|[^<>\s]+))>)|([ -~])'
+# rules
+# <DELAY [num]>
+# <[lof_modif]?[escape_en][special_id]>
+# <[lof_modif]?[special_key]+>
+# normal_key
+# # comment
+# <#> hash-tag
+KEY_SEQV_REGEX = r'(<DELAY (\d+)>)|(<(((?:[a-zA-Z]{1,2}-)*)(\\)?([^<>\s]+))>)|(#.*)|([ -~])'
 LINE_REGEX = r'^(<[^<>\s]+>|[ -~\s])*$'

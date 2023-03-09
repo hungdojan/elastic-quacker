@@ -1,7 +1,7 @@
 from .key_seqv import Key, Modifier
 
 modifier_mapping = {
-    'c': Modifier.LCTRL,
+    'c':  Modifier.LCTRL,
     's':  Modifier.LSHIFT,
     'a':  Modifier.LALT,
     'm':  Modifier.LMETA,
@@ -24,7 +24,9 @@ special_key_naming = {
 special_mapping = {
     'enter': Key.KEY_ENTER,
     'escape': Key.KEY_ESCAPE,
+    'esc': Key.KEY_ESCAPE,
     'backspace': Key.KEY_BACKSPACE,
+    'bs': Key.KEY_BACKSPACE,
     'tab': Key.KEY_TAB,
     'space': Key.KEY_SPACE,
     'caps_lock': Key.KEY_CAPS_LOCK,
@@ -59,6 +61,16 @@ special_mapping = {
     'num_subtract': Key.KEY_KEYPAD_SUBTRACT,
     'num_add': Key.KEY_KEYPAD_ADD,
     'num_enter': Key.KEY_KEYPAD_ENTER,
+    'num1': Key.KEY_KEYPAD_1,
+    'num2': Key.KEY_KEYPAD_2,
+    'num3': Key.KEY_KEYPAD_3,
+    'num4': Key.KEY_KEYPAD_4,
+    'num5': Key.KEY_KEYPAD_5,
+    'num6': Key.KEY_KEYPAD_6,
+    'num7': Key.KEY_KEYPAD_7,
+    'num8': Key.KEY_KEYPAD_8,
+    'num9': Key.KEY_KEYPAD_9,
+    'num0': Key.KEY_KEYPAD_0,
     'num_1': Key.KEY_KEYPAD_1,
     'num_2': Key.KEY_KEYPAD_2,
     'num_3': Key.KEY_KEYPAD_3,

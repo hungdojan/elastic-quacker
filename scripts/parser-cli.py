@@ -51,6 +51,11 @@ def main():
     ksp.parse_content()
     ksp.generate_output_file()
 
+    # close files
+    if in_filename:
+        in_f.close()
+    if out_filename:
+        out_f.close()
 
 if __name__ == '__main__':
     main()
