@@ -129,6 +129,13 @@ class KeySeqvParser:
             self.__ks_struct['keys'].append(normal_mapping[value])
 
 
+    def __parse_normal_keys_in_special(self, keys: str) -> tuple[bool, list[Key]]:
+        keys_pressed = []
+        for i in keys:
+            pass
+        return True, keys_pressed
+
+
     def __check_special_keys(self, match: list, line_index: int):
         used_modifiers: list[Modifier] = []
         if match[Groups.SPECIAL_MODIFIERS.value]:
@@ -136,47 +143,64 @@ class KeySeqvParser:
             seqv_modifiers = match[Groups.SPECIAL_MODIFIERS.value].split('-')[:-1]
             for m in seqv_modifiers:
                 if not modifier_mapping.get(m.lower()):
-                    logging.error(f'Unexpected modifier "{m}" in "{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}!')
+                    logging.error(f'Unexpected modifier "{m}" in',
+                                   '"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}!')
                     # FIXME: exception
                     continue
                 if modifier_mapping[m.lower()] in used_modifiers:
-                    logging.warn(f'Duplicate use of modifier "{m}" in "{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
+                    logging.warn(f'Duplicate use of modifier "{m}" in',
+                                  '"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
                     continue
                 used_modifiers.append(modifier_mapping[m.lower()])
 
-        # TODO: load escape
-        non_modifier_key: str = match[Groups.SPECIAL_KEYS_OR_ID.value]
-        # special key (like escape or return)
-        if non_modifier_key.lower() in special_mapping:
-            self.__ks_struct['keys'].append(special_mapping[non_modifier_key.lower()])
-            self.__ks_struct['modifiers'] = used_modifiers
-            self.__push_pressed_and_released()
-            return
-        if non_modifier_key.lower() in special_key_naming:
-            # add shift if not toggled yet
-            # TODO: shift error
-            keys_info = special_key_naming[non_modifier_key.lower()]
-            if keys_info[0] and keys_info[0] not in used_modifiers:
-                used_modifiers.append(keys_info[0])
-
-            self.__ks_struct['keys'].append(keys_info[1])
-            self.__ks_struct['modifiers'] = used_modifiers
-            self.__push_pressed_and_released()
-            return
-        # can't send more than 1 keys at once
-        # TODO: implement multiple presses at the same time (max 6)
-        elif len(non_modifier_key) > 1:
-            print(f'error {match[Groups.SPECIAL_ORIGINAL.value]}, here')
-            # TODO: error
-            pass
-        else:
-            if (Modifier.LSHIFT in used_modifiers or
-                Modifier.RSHIFT in used_modifiers):
-                # TODO: error
-                print(f'error {match[Groups.SPECIAL_ORIGINAL.value]}')
+        special_value: str = match[Groups.SPECIAL_VALUE.value]
+        # the escape sign on this position tells the parser that
+        # the next set of characters defines a special keys name
+        # (special_mapping or special_key_naming)
+        if match[Groups.SPECIAL_ESCAPE_EN.value]:
+            # special key (like escape or return)
+            if special_value.lower() in special_mapping:
+                self.__ks_struct['keys'].append(special_mapping[special_value.lower()])
+                self.__ks_struct['modifiers'] = used_modifiers
+                # FIXME: delay
+                self.__push_pressed_and_released()
                 return
-            self.__ks_struct['modifiers'] = used_modifiers
-            self.__check_normal_keys(non_modifier_key)
+            if special_value.lower() in special_key_naming:
+                # add shift if not toggled yet
+                # TODO: shift error
+                key_modifier, key_value = special_key_naming[special_value.lower()]
+                if key_modifier and key_modifier not in used_modifiers:
+                    used_modifiers.append(key_modifier)
+
+                self.__ks_struct['keys'].append(key_value)
+                self.__ks_struct['modifiers'] = used_modifiers
+                # FIXME: delay
+                self.__push_pressed_and_released()
+                return
+            # TODO: error unknown special key name
+            logging.error(f'Unknown special key value:',
+                           '"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
+
+        # otherwise normal keys are expected
+        # can't send more than 6 keys at once
+        if len(special_value) > 6:
+            logging.error(f'Special sequence value is too long (max 6 keys):',
+                           '"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
+            return
+        # shift should not be toggled yet
+        if (Modifier.LSHIFT in used_modifiers or
+            Modifier.RSHIFT in used_modifiers):
+            logging.error('When pressing normal keys, special key sequence should',
+                          'not contain shift modifier in the script.')
+            logging.error(f'Remove "s-" from {match[Groups.SPECIAL_ORIGINAL.value]} on line {line_index+1}')
+            return
+        # TODO: test duplicity
+        is_shift_toggled, keys_pressed = self.__parse_normal_keys_in_special(special_value)
+        if is_shift_toggled:
+            used_modifiers.append(Modifier.LSHIFT)
+        self.__ks_struct['modifiers'] = used_modifiers
+        self.__ks_struct['keys'] = keys_pressed
+        # TODO: push but with delay
 
 
     def parse_line(self, line: str, line_index: int):
