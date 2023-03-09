@@ -31,8 +31,7 @@ struct key_seqv_t key_seqvs[] = {{
 """.format(datetime.strftime(datetime.today(), '%d/%m/%Y'))
 
 FOOTER_CONTENT = \
-"""    LAST_ITEM,
-};
+"""};
 """
 
 class KeySeqvParser:
@@ -136,17 +135,17 @@ class KeySeqvParser:
             # extracts modifiers
             seqv_modifiers = match[Groups.SPECIAL_MODIFIERS.value].split('-')[:-1]
             for m in seqv_modifiers:
-                if not modifier_mapping.get(m):
+                if not modifier_mapping.get(m.lower()):
                     logging.error(f'Unexpected modifier "{m}" in "{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}!')
                     # FIXME: exception
                     continue
-                if modifier_mapping[m] in used_modifiers:
+                if modifier_mapping[m.lower()] in used_modifiers:
                     logging.warn(f'Duplicate use of modifier "{m}" in "{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
                     continue
-                used_modifiers.append(modifier_mapping[m])
+                used_modifiers.append(modifier_mapping[m.lower()])
 
-        # TODO: special case for shift
-        non_modifier_key: str = match[Groups.SPECIAL_KEYS.value]
+        # TODO: load escape
+        non_modifier_key: str = match[Groups.SPECIAL_KEYS_OR_ID.value]
         # special key (like escape or return)
         if non_modifier_key.lower() in special_mapping:
             self.__ks_struct['keys'].append(special_mapping[non_modifier_key.lower()])
@@ -167,14 +166,14 @@ class KeySeqvParser:
         # can't send more than 1 keys at once
         # TODO: implement multiple presses at the same time (max 6)
         elif len(non_modifier_key) > 1:
+            print(f'error {match[Groups.SPECIAL_ORIGINAL.value]}, here')
             # TODO: error
             pass
         else:
-            # TODO: shift problem
-            if non_modifier_key in shift_mapping or non_modifier_key.isupper() and \
-               Modifier.LSHIFT not in self.__ks_struct['modifiers'] and \
-               Modifier.RSHIFT not in self.__ks_struct['modifiers']:
+            if (Modifier.LSHIFT in used_modifiers or
+                Modifier.RSHIFT in used_modifiers):
                 # TODO: error
+                print(f'error {match[Groups.SPECIAL_ORIGINAL.value]}')
                 return
             self.__ks_struct['modifiers'] = used_modifiers
             self.__check_normal_keys(non_modifier_key)
@@ -210,20 +209,18 @@ class KeySeqvParser:
                     self.__push_pressed_and_released()
                 self.__check_special_keys(match, line_index)
 
+            # ignoring comments
+            if match[Groups.COMMENT.value]:
+                pass
+
             # load normal keys
             elif match[Groups.NORMAL_KEYS.value]:
                 value: str = match[Groups.NORMAL_KEYS.value]
                 self.__check_normal_keys(value)
 
-
         # finish last item pending (if exists)
         if self.__ks_struct['keys']:
             self.__push_pressed_and_released()
-
-        # set last item as last item
-        if self._lof_keyseqvs:
-            last_item = self._lof_keyseqvs[-1]
-            last_item.last = True
 
 
     def parse_content(self):
@@ -237,6 +234,11 @@ class KeySeqvParser:
 
             # parsing
             self.parse_line(line, i)
+
+        # set last item as last item
+        if self._lof_keyseqvs:
+            last_item = self._lof_keyseqvs[-1]
+            last_item.last = True
 
 
     def generate_output_file(self):
