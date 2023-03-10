@@ -34,14 +34,23 @@ FOOTER_CONTENT = \
 """};
 """
 
+log_fun = {
+    logging.WARN: logging.warn,
+    logging.ERROR: logging.error,
+    logging.INFO: logging.info,
+    logging.DEBUG: logging.debug
+}
+
 class KeySeqvParser:
 
     def __init__(self, in_file: TextIO|TextIOWrapper=sys.stdin,
-                 out_file: TextIO|TextIOWrapper=sys.stdout):
+                 out_file: TextIO|TextIOWrapper=sys.stdout,
+                 verbose: bool=False):
+        self._verbose = verbose
         self._in_file = in_file
         self._out_file = out_file
         self._lof_keyseqvs: list[KeySeqv] = []
-        self.__new_sequence_structure()
+        self._new_sequence_structure()
         self._compile_patterns()
 
 
@@ -71,27 +80,58 @@ class KeySeqvParser:
             self._in_file = new_in_file
 
 
-
-    def __new_sequence_structure(self):
+    def _new_sequence_structure(self):
         """Create a new structure for the keys."""
-        self.__ks_struct = {
+        self._ks_struct = {
             'delay': 0,
             'modifiers': [],
             'keys': []
         }
 
 
-    def __push_pressed_and_released(self):
+    def _create_log(self, _type: int, msg: str):
+        """Write a report into logging file."""
+        if not self._verbose:
+            return
+
+        fnc = log_fun.get(_type)
+        if fnc:
+            fnc(msg)
+
+
+    def _log_seqv_content(self):
+        out_str = ''
+        # log delay
+        if self._ks_struct['delay']:
+            status = 'Wait' if not self._ks_struct['keys'] else 'Hold'
+            out_str += f'Delay: {self._ks_struct["delay"]}; '
+        # log modifiers
+        if self._ks_struct['modifiers']:
+            out_str += ' ' if out_str else ''
+            modifiers = ', '.join([x.name for x in self._ks_struct['modifiers']])
+            out_str += f'Modifiers: [{modifiers}];'
+        # log keys
+        if self._ks_struct['keys']:
+            out_str += ' ' if out_str else ''
+            keys = ', '.join([mapping_keys[mapping_values.index(x)]
+                              for x in self._ks_struct['keys']])
+            out_str += f'Keys: [{keys}]'
+        # write into log
+        self._create_log(logging.INFO, out_str)
+
+
+    def _push_pressed_and_released(self):
         """Simulate keys press and prepare new key sequence structure."""
         # keys pressed
-        self._lof_keyseqvs.append(KeySeqv(**self.__ks_struct))
-        self.__new_sequence_structure()
+        self._lof_keyseqvs.append(KeySeqv(**self._ks_struct))
+        self._log_seqv_content()
+        self._new_sequence_structure()
         # keys released
-        self._lof_keyseqvs.append(KeySeqv(**self.__ks_struct))
-        self.__new_sequence_structure()
+        self._lof_keyseqvs.append(KeySeqv(**self._ks_struct))
+        self._new_sequence_structure()
 
 
-    def __check_normal_keys(self, value: str):
+    def _check_normal_keys(self, value: str):
         # check if symbol requires shift modifier
         if value in shift_mapping or value.isupper():
             key_macro_name = normal_mapping[shift_mapping[value]] \
@@ -100,56 +140,88 @@ class KeySeqvParser:
             # first check if the key is already being pressed
             # if so we need to release it first (push current sequence)
             # and press it again
-            if key_macro_name in self.__ks_struct['keys']:
-                self.__push_pressed_and_released()
+            if key_macro_name in self._ks_struct['keys']:
+                self._push_pressed_and_released()
 
             # new sequence
-            if not self.__ks_struct['keys']:
-                self.__ks_struct['modifiers'].append(Modifier.LSHIFT)
+            if not self._ks_struct['keys']:
+                self._ks_struct['modifiers'].append(Modifier.LSHIFT)
             # shift is not toggled yet push the key sequence first
-            elif Modifier.LSHIFT not in self.__ks_struct['modifiers'] and \
-                 Modifier.RSHIFT not in self.__ks_struct['modifiers']:
-                self.__push_pressed_and_released()
-                self.__ks_struct['modifiers'].append(Modifier.LSHIFT)
+            elif Modifier.LSHIFT not in self._ks_struct['modifiers'] and \
+                 Modifier.RSHIFT not in self._ks_struct['modifiers']:
+                self._push_pressed_and_released()
+                self._ks_struct['modifiers'].append(Modifier.LSHIFT)
 
-            self.__ks_struct['keys'].append(key_macro_name)
+            self._ks_struct['keys'].append(key_macro_name)
 
         else:
             key_macro_name = normal_mapping[value]
             # first check if the key is already being pressed
             # if so we need to release it first (push current sequence)
             # and press it again
-            if key_macro_name in self.__ks_struct['keys']:
-                self.__push_pressed_and_released()
+            if key_macro_name in self._ks_struct['keys']:
+                self._push_pressed_and_released()
 
             # if shift is toggled push the key sequence first
-            if Modifier.LSHIFT in self.__ks_struct['modifiers'] or \
-               Modifier.RSHIFT in self.__ks_struct['modifiers']:
-                self.__push_pressed_and_released()
-            self.__ks_struct['keys'].append(normal_mapping[value])
+            if Modifier.LSHIFT in self._ks_struct['modifiers'] or \
+               Modifier.RSHIFT in self._ks_struct['modifiers']:
+                self._push_pressed_and_released()
+            self._ks_struct['keys'].append(normal_mapping[value])
 
 
-    def __parse_normal_keys_in_special(self, keys: str) -> tuple[bool, list[Key]]:
+    def _parse_normal_keys_in_special(self, match: list,
+                                      line_index: int) -> tuple[bool, list[Key]]:
+        keys = match[Groups.SPECIAL_VALUE.value]
         keys_pressed = []
-        for i in keys:
-            pass
-        return True, keys_pressed
+        is_shift_toggled = False
+        for i, key in enumerate(keys):
+            if i == 0:
+                is_shift_toggled = key in shift_mapping or key.isupper()
+
+            # shift keys
+            if (is_shift_toggled and (key in shift_mapping or key.isupper())):
+                key_macro_name = normal_mapping[shift_mapping[key]] \
+                                 if key in shift_mapping else \
+                                 normal_mapping[key.lower()]
+                # the key is already pressed
+                if key_macro_name in keys_pressed:
+                    self._create_log(logging.WARN,
+                                     f'The key "{key}" is pressed multiple times in ' \
+                                     f'"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
+                    continue
+                keys_pressed.append(key_macro_name)
+            # non-shift keys
+            elif (not is_shift_toggled and key not in shift_mapping and not key.isupper()):
+                # the key is already pressed
+                if normal_mapping[key] in keys_pressed:
+                    self._create_log(logging.WARN,
+                                     f'The key "{key}" is pressed multiple times in ' \
+                                     f'"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
+                    continue
+                keys_pressed.append(normal_mapping[key])
+            else:
+                self._create_log(logging.ERROR,
+                                 'Inconsistent use of shift modifier in ' \
+                                 f'"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}!')
+                return False, []
+        return is_shift_toggled, keys_pressed
 
 
-    def __check_special_keys(self, match: list, line_index: int):
+    def _check_special_keys(self, match: list, line_index: int) -> bool:
         used_modifiers: list[Modifier] = []
         if match[Groups.SPECIAL_MODIFIERS.value]:
             # extracts modifiers
             seqv_modifiers = match[Groups.SPECIAL_MODIFIERS.value].split('-')[:-1]
             for m in seqv_modifiers:
                 if not modifier_mapping.get(m.lower()):
-                    logging.error(f'Unexpected modifier "{m}" in',
-                                   '"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}!')
-                    # FIXME: exception
-                    continue
+                    self._create_log(logging.ERROR,
+                                     f'Unexpected modifier "{m}" in "{match[Groups.SPECIAL_ORIGINAL.value]}" ' \
+                                     f'on line {line_index+1}!')
+                    return False
                 if modifier_mapping[m.lower()] in used_modifiers:
-                    logging.warn(f'Duplicate use of modifier "{m}" in',
-                                  '"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
+                    self._create_log(logging.WARN,
+                                     f'Duplicate use of modifier "{m}" in ' \
+                                     f'"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
                     continue
                 used_modifiers.append(modifier_mapping[m.lower()])
 
@@ -160,91 +232,105 @@ class KeySeqvParser:
         if match[Groups.SPECIAL_ESCAPE_EN.value]:
             # special key (like escape or return)
             if special_value.lower() in special_mapping:
-                self.__ks_struct['keys'].append(special_mapping[special_value.lower()])
-                self.__ks_struct['modifiers'] = used_modifiers
-                # FIXME: delay
-                self.__push_pressed_and_released()
-                return
+                self._ks_struct['keys'].append(special_mapping[special_value.lower()])
+                self._ks_struct['modifiers'] = used_modifiers
+                return True
             if special_value.lower() in special_key_naming:
                 # add shift if not toggled yet
-                # TODO: shift error
                 key_modifier, key_value = special_key_naming[special_value.lower()]
                 if key_modifier and key_modifier not in used_modifiers:
                     used_modifiers.append(key_modifier)
 
-                self.__ks_struct['keys'].append(key_value)
-                self.__ks_struct['modifiers'] = used_modifiers
-                # FIXME: delay
-                self.__push_pressed_and_released()
-                return
-            # TODO: error unknown special key name
-            logging.error(f'Unknown special key value:',
-                           '"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
+                self._ks_struct['keys'].append(key_value)
+                self._ks_struct['modifiers'] = used_modifiers
+                return True
+            self._create_log(logging.ERROR,
+                             'Unknown special key value: ' \
+                             f'"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
+            return False
 
         # otherwise normal keys are expected
         # can't send more than 6 keys at once
         if len(special_value) > 6:
-            logging.error(f'Special sequence value is too long (max 6 keys):',
-                           '"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
-            return
+            self._create_log(logging.ERROR,
+                             'Special sequence value is too long (max 6 keys): ' \
+                             f'"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
+            return False
         # shift should not be toggled yet
         if (Modifier.LSHIFT in used_modifiers or
             Modifier.RSHIFT in used_modifiers):
-            logging.error('When pressing normal keys, special key sequence should',
-                          'not contain shift modifier in the script.')
-            logging.error(f'Remove "s-" from {match[Groups.SPECIAL_ORIGINAL.value]} on line {line_index+1}')
-            return
-        # TODO: test duplicity
-        is_shift_toggled, keys_pressed = self.__parse_normal_keys_in_special(special_value)
+            self._create_log(logging.ERROR,
+                             'When pressing normal keys, special key sequence ' \
+                             'should not contain shift modifier in the script.')
+            self._create_log(logging.ERROR,
+                             f'Remove "s-" from {match[Groups.SPECIAL_ORIGINAL.value]} on line {line_index+1}')
+            return False
+
+        # get the sequence
+        is_shift_toggled, keys_pressed = self._parse_normal_keys_in_special(match, line_index)
+        if not keys_pressed:
+            return False
         if is_shift_toggled:
             used_modifiers.append(Modifier.LSHIFT)
-        self.__ks_struct['modifiers'] = used_modifiers
-        self.__ks_struct['keys'] = keys_pressed
-        # TODO: push but with delay
+        self._ks_struct['modifiers'] = used_modifiers
+        self._ks_struct['keys'] = keys_pressed
+        return True
 
 
     def parse_line(self, line: str, line_index: int):
 
-        self.__new_sequence_structure()
+        self._new_sequence_structure()
         matches = self._key_seqv_regex.findall(line)
+        is_special = False
 
         for match in matches:
             # TODO: hold delay
-            # wait delay
+            # wait delay <DELAY [time_in_ms]>
             if match[Groups.DELAY_WAIT_ORIGINAL.value]:
                 # finish previous sequence and add delay to the new one
-                if self.__ks_struct['keys'] or self.__ks_struct['delay']:
+                if self._ks_struct['keys'] or self._ks_struct['delay']:
                     # keys pressed
-                    self._lof_keyseqvs.append(KeySeqv(**self.__ks_struct))
-                    self.__new_sequence_structure()
+                    self._lof_keyseqvs.append(KeySeqv(**self._ks_struct))
+                    self._log_seqv_content()
+                    self._new_sequence_structure()
                 # keys release with delay
-                self.__ks_struct['delay'] = int(match[Groups.DELAY_WAIT_VALUE.value])
-                self._lof_keyseqvs.append(KeySeqv(**self.__ks_struct))
-                self.__new_sequence_structure()
+                self._ks_struct['delay'] = int(match[Groups.DELAY_WAIT_VALUE.value])
+                self._lof_keyseqvs.append(KeySeqv(**self._ks_struct))
+                self._log_seqv_content()
+                self._new_sequence_structure()
+                is_special = False
+
+            # checks if previous sequence was special one
+            # if so push that
+            if is_special:
+                self._push_pressed_and_released()
+                is_special = False
 
             # max 6 keys pressed are allowed to be sent at the same time
-            if len(self.__ks_struct['keys']) > 5:
-                self.__push_pressed_and_released()
+            if len(self._ks_struct['keys']) > 5:
+                self._push_pressed_and_released()
 
-            # load special
+            # load special <[content]>
             if match[Groups.SPECIAL_ORIGINAL.value]:
                 # push current sequence and create it for special sequence
-                if self.__ks_struct['keys']:
-                    self.__push_pressed_and_released()
-                self.__check_special_keys(match, line_index)
+                if self._ks_struct['keys']:
+                    self._push_pressed_and_released()
+                # if hold delay is defined push it immediately
+                # if self._ks_struct['delay'] > 0:
+                is_special = self._check_special_keys(match, line_index)
 
-            # ignoring comments
+            # ignoring comments [everything that start with # character]
             if match[Groups.COMMENT.value]:
                 pass
 
-            # load normal keys
+            # load normal keys [any_printable]
             elif match[Groups.NORMAL_KEYS.value]:
                 value: str = match[Groups.NORMAL_KEYS.value]
-                self.__check_normal_keys(value)
+                self._check_normal_keys(value)
 
         # finish last item pending (if exists)
-        if self.__ks_struct['keys']:
-            self.__push_pressed_and_released()
+        if self._ks_struct['keys']:
+            self._push_pressed_and_released()
 
 
     def parse_content(self):
@@ -253,7 +339,7 @@ class KeySeqvParser:
         for i, line in enumerate(self._in_file):
             # line check
             if not self._line_regex.match(line):
-                logging.warn(f'Unexpected character in line {i+1}')
+                self._create_log(logging.WARN, f'Unexpected character in line {i+1}')
                 continue
 
             # parsing

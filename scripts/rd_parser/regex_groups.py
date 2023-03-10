@@ -12,9 +12,9 @@ class Groups(enum.Enum):
     NORMAL_KEYS         = 8
 
 
-# TODO: comment
-# rules
+# rules:
 # <DELAY [num]>
+# TODO: HOLD TIME
 # <[lof_modif]?[escape_en][special_id]>
 # <[lof_modif]?[special_key]+>
 # normal_key
