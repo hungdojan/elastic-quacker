@@ -33,3 +33,8 @@ class UndefinedSpecialKeyNameError(ParserError):
 class KeySequenceSizeExceededError(ParserError):
     """User exceeded maximum number of keys that can be pressed at the same time."""
     pass
+
+
+class ShiftToggleWithNormalKeyError(ParserError):
+    """Cannot combine shift modifier in special sequence together with normal keys."""
+    pass
