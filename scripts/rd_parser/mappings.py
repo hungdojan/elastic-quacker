@@ -1,5 +1,6 @@
 from .key_seqv import Key, Modifier
 
+# mapping modifier's name to values
 modifier_mapping = {
     'c':  Modifier.LCTRL,
     's':  Modifier.LSHIFT,
@@ -15,12 +16,17 @@ modifier_mapping = {
     'rm': Modifier.RMETA,
 }
 
+# < and > symbols have a role in this script's language
+# user cannot use them in the special sequence and is required
+# to use their unique name
+# e. g.: to press the combination a-s-., write <a-gt>; <a->> is syntax error
 special_key_naming = {
     'lt': (Modifier.LSHIFT, Key.KEY_COMMA),
     'gt': (Modifier.LSHIFT, Key.KEY_PERIOD)
 }
 
-
+# list of special key names
+# these keys don't produce a printable character when typing
 special_mapping = {
     'enter': Key.KEY_ENTER,
     'escape': Key.KEY_ESCAPE,
@@ -159,6 +165,7 @@ special_mapping = {
     'exsel': Key.KEY_EXSEL,
 }
 
+# all the keys that produces a printable character when typing.
 normal_mapping = {
     'a': Key.KEY_A,
     'b': Key.KEY_B,
@@ -210,6 +217,8 @@ normal_mapping = {
     '/': Key.KEY_SLASH
 }
 
+
+# list of characters that can be typed only with shift modifier toggled
 shift_mapping = {
     "~": "`",
     "!": "1",
@@ -233,3 +242,7 @@ shift_mapping = {
     ">": ".",
     "?": "/",
 }
+
+# list of backwards mapping used in debugging
+mapping_keys = list(special_mapping.keys()) + list(normal_mapping.keys())
+mapping_values = list(special_mapping.values()) + list(normal_mapping.values())
