@@ -185,25 +185,51 @@ class KeySeqv:
 
     def __init__(self, keys: list[Key], delay: int=0,
                  modifiers: list[Modifier]=[], last: bool=False):
-        self.delay = delay
-        self.modifiers = modifiers
-        self.keys = keys
-        self.last = last
+        self.__delay = delay
+        self.__modifiers = modifiers
+        self.__keys = keys
+        self.__last = last
+
+
+    @property
+    def delay(self) -> int:
+        return self.__delay
+
+
+    @property
+    def modifiers(self) -> tuple[Modifier]:
+        return tuple(self.__modifiers)
+
+
+    @property
+    def keys(self) -> tuple[Key]:
+        return tuple(self.__keys)
+
+
+    @property
+    def last(self) -> bool:
+        return self.__last
+
+
+    @last.setter
+    def last(self, value: bool):
+        self.__last = value
+
 
     def __str__(self) -> str:
         out = '    {'
-        out += f'{self.delay}, {{'
-        if self.modifiers:
-            out += '|'.join([m.value for m in self.modifiers])
+        out += f'{self.__delay}, {{'
+        if self.__modifiers:
+            out += '|'.join([m.value for m in self.__modifiers])
         else:
             out += '0'
         out += ', 0, {'
-        if self.keys:
-            out += ', '.join([k.value for k in self.keys])
+        if self.__keys:
+            out += ', '.join([k.value for k in self.__keys])
         else:
             out += '0,'
         out += '}}, '
-        out += f'{"true" if self.last else "false"}}},\n'
+        out += f'{"true" if self.__last else "false"}}},\n'
         return out
 
 

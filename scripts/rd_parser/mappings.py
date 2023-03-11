@@ -20,7 +20,7 @@ modifier_mapping = {
 # user cannot use them in the special sequence and is required
 # to use their unique name
 # e. g.: to press the combination a-s-., write <a-gt>; <a->> is syntax error
-special_key_naming = {
+macro_keys = {
     'lt': (Modifier.LSHIFT, Key.KEY_COMMA),
     'gt': (Modifier.LSHIFT, Key.KEY_PERIOD)
 }

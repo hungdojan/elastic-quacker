@@ -1,0 +1,5 @@
+[project]
+name = "Rubber Ducky parser"
+
+[tool.pytest.ini_options]
+addopts="--ignore=pico-sdk --html=reports/test_report.html --self-contained-html --cov-report html:reports/htmlcov --cov-report term --cov=rd_parser --cov=rd_client"

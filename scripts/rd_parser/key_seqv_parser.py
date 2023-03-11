@@ -1,9 +1,10 @@
 import logging
 import re
 
+from .error import *
 from .key_seqv import KeySeqv
-from .regex_groups import Groups, KEY_SEQV_REGEX, LINE_REGEX
 from .mappings import *
+from .regex_groups import Groups, KEY_SEQV_REGEX, LINE_REGEX
 
 
 LOG_FUN = {
@@ -160,7 +161,8 @@ class KeySeqvParser:
                 self._create_log(logging.ERROR,
                                  'Inconsistent use of shift modifier in ' \
                                  f'"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}!')
-                return False, []
+                raise SpecialSequenceShiftToggleError()
+                # return False, []
         return is_shift_toggled, keys_pressed
 
 
@@ -174,8 +176,7 @@ class KeySeqvParser:
                     self._create_log(logging.ERROR,
                                      f'Unexpected modifier "{m}" in "{match[Groups.SPECIAL_ORIGINAL.value]}" ' \
                                      f'on line {line_index+1}!')
-                    # TODO: exception
-                    return False
+                    raise UnknownModifierError()
                 if modifier_mapping[m.lower()] in used_modifiers:
                     self._create_log(logging.WARN,
                                      f'Duplicate use of modifier "{m}" in ' \
@@ -186,7 +187,7 @@ class KeySeqvParser:
         special_value: str = match[Groups.SPECIAL_VALUE.value]
         # the escape sign on this position tells the parser that
         # the next set of characters defines a special keys name
-        # (special_mapping or special_key_naming)
+        # (special_mapping or macro_keys)
         if match[Groups.SPECIAL_ESCAPE_EN.value]:
             # special key (like escape or return)
             if special_value.lower() in special_mapping:
@@ -195,9 +196,10 @@ class KeySeqvParser:
                 if match[Groups.SPECIAL_HOLD_DELAY.value]:
                     self._ks_struct['delay'] = int(match[Groups.SPECIAL_HOLD_DELAY.value])
                 return True
-            if special_value.lower() in special_key_naming:
+            # macro key (like gt or lt)
+            if special_value.lower() in macro_keys:
                 # add shift if not toggled yet
-                key_modifier, key_value = special_key_naming[special_value.lower()]
+                key_modifier, key_value = macro_keys[special_value.lower()]
                 if key_modifier and key_modifier not in used_modifiers:
                     used_modifiers.append(key_modifier)
 
@@ -209,8 +211,7 @@ class KeySeqvParser:
             self._create_log(logging.ERROR,
                              f'Unknown special key value "{special_value}" in ' \
                              f'"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
-            # TODO: exception
-            return False
+            raise UndefinedSpecialKeyNameError()
 
         # otherwise normal keys are expected
         # can't send more than 6 keys at once
@@ -218,8 +219,7 @@ class KeySeqvParser:
             self._create_log(logging.ERROR,
                              'Special sequence value is too long (max 6 keys): ' \
                              f'"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
-            # TODO: exception
-            return False
+            raise KeySequenceSizeExceededError()
         # shift should not be toggled yet
         if (Modifier.LSHIFT in used_modifiers or
             Modifier.RSHIFT in used_modifiers):
@@ -228,16 +228,14 @@ class KeySeqvParser:
                              'should not contain shift modifier in the script.')
             self._create_log(logging.ERROR,
                              f'Remove "s-" from {match[Groups.SPECIAL_ORIGINAL.value]} on line {line_index+1}')
-            # TODO: exception
-            return False
+            raise ShiftToggleWithNormalKeyError()
 
         # get the sequence
         is_shift_toggled, keys_pressed = self._parse_normal_keys_in_special(match, line_index)
-        if not keys_pressed:
-            # TODO: exception
-            return False
+
         if is_shift_toggled:
             used_modifiers.append(Modifier.LSHIFT)
+
         self._ks_struct['modifiers'] = used_modifiers
         self._ks_struct['keys'] = keys_pressed
         if match[Groups.SPECIAL_HOLD_DELAY.value]:
@@ -251,7 +249,7 @@ class KeySeqvParser:
             self._create_log(logging.ERROR,
                              f'Line {line_index+1} contains an unknown character. ' \
                              'Only printable ascii characters are allowed.')
-            return
+            raise NonReadableCharacterError()
 
         matches = self._key_seqv_regex.findall(line)
 
@@ -279,10 +277,10 @@ class KeySeqvParser:
                 # push current sequence and create it for special sequence
                 if self._ks_struct['keys']:
                     self._push_pressed_and_released()
+
+                self._check_special_sequence(match, line_index)
+
                 # if hold delay is defined push it immediately
-                if not self._check_special_sequence(match, line_index):
-                    # TODO: exception
-                    continue
                 if self._ks_struct['delay'] > 0:
                     self._lof_keyseqvs.append(KeySeqv(**self._ks_struct))
                     self._log_seqv_content()
