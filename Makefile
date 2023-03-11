@@ -4,7 +4,7 @@ OS_NAME="Linux"
 
 ##############################################
 
-.PHONY: build rubber_ducky doc pack clean
+.PHONY: build rubber_ducky doc run_tests pack clean
 
 all: build
 
@@ -20,6 +20,9 @@ doc: Doxygen
 pack: src/* README.md Makefile CMakeLists.txt Doxygen
 	rm -f *.zip
 	zip -r $(TARGET_NAME) $^
+
+run_tests:
+	cd scripts/tests/ && pytest
 
 clean:
 	rm -rf doc *.zip $(BUILD_DIR)

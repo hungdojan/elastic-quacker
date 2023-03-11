@@ -4,6 +4,7 @@
 .ccls
 compile_commands.json
 pico_sdk_import.cmake
+.coverage
 
 doc/
 .ccls-cache/
@@ -12,3 +13,4 @@ build/
 __pycache__/
 .vscode/
 .cache/
+reports/
