@@ -1,9 +1,5 @@
 import logging
 import re
-import sys
-from io import TextIOWrapper
-from typing import TextIO
-from datetime import datetime
 
 from .key_seqv import KeySeqv
 from .regex_groups import Groups, KEY_SEQV_REGEX, LINE_REGEX
@@ -67,15 +63,13 @@ class KeySeqvParser:
         # log delay
         if self._ks_struct['delay']:
             status = 'Wait' if not self._ks_struct['keys'] else 'Hold'
-            out_str += f'{status}: {self._ks_struct["delay"]}; '
+            out_str += f'{status}: {self._ks_struct["delay"]} ms; '
         # log modifiers
         if self._ks_struct['modifiers']:
-            out_str += ' ' if out_str else ''
             modifiers = ', '.join([x.name for x in self._ks_struct['modifiers']])
-            out_str += f'Modifiers: [{modifiers}];'
+            out_str += f'Modifiers: [{modifiers}]; '
         # log keys
         if self._ks_struct['keys']:
-            out_str += ' ' if out_str else ''
             keys = ', '.join([mapping_keys[mapping_values.index(x)]
                               for x in self._ks_struct['keys']])
             out_str += f'Keys: [{keys}]'
@@ -180,6 +174,7 @@ class KeySeqvParser:
                     self._create_log(logging.ERROR,
                                      f'Unexpected modifier "{m}" in "{match[Groups.SPECIAL_ORIGINAL.value]}" ' \
                                      f'on line {line_index+1}!')
+                    # TODO: exception
                     return False
                 if modifier_mapping[m.lower()] in used_modifiers:
                     self._create_log(logging.WARN,
@@ -197,6 +192,8 @@ class KeySeqvParser:
             if special_value.lower() in special_mapping:
                 self._ks_struct['keys'].append(special_mapping[special_value.lower()])
                 self._ks_struct['modifiers'] = used_modifiers
+                if match[Groups.SPECIAL_HOLD_DELAY.value]:
+                    self._ks_struct['delay'] = int(match[Groups.SPECIAL_HOLD_DELAY.value])
                 return True
             if special_value.lower() in special_key_naming:
                 # add shift if not toggled yet
@@ -206,10 +203,13 @@ class KeySeqvParser:
 
                 self._ks_struct['keys'].append(key_value)
                 self._ks_struct['modifiers'] = used_modifiers
+                if match[Groups.SPECIAL_HOLD_DELAY.value]:
+                    self._ks_struct['delay'] = int(match[Groups.SPECIAL_HOLD_DELAY.value])
                 return True
             self._create_log(logging.ERROR,
                              f'Unknown special key value "{special_value}" in ' \
                              f'"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
+            # TODO: exception
             return False
 
         # otherwise normal keys are expected
@@ -218,6 +218,7 @@ class KeySeqvParser:
             self._create_log(logging.ERROR,
                              'Special sequence value is too long (max 6 keys): ' \
                              f'"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
+            # TODO: exception
             return False
         # shift should not be toggled yet
         if (Modifier.LSHIFT in used_modifiers or
@@ -227,16 +228,20 @@ class KeySeqvParser:
                              'should not contain shift modifier in the script.')
             self._create_log(logging.ERROR,
                              f'Remove "s-" from {match[Groups.SPECIAL_ORIGINAL.value]} on line {line_index+1}')
+            # TODO: exception
             return False
 
         # get the sequence
         is_shift_toggled, keys_pressed = self._parse_normal_keys_in_special(match, line_index)
         if not keys_pressed:
+            # TODO: exception
             return False
         if is_shift_toggled:
             used_modifiers.append(Modifier.LSHIFT)
         self._ks_struct['modifiers'] = used_modifiers
         self._ks_struct['keys'] = keys_pressed
+        if match[Groups.SPECIAL_HOLD_DELAY.value]:
+            self._ks_struct['delay'] = int(match[Groups.SPECIAL_HOLD_DELAY.value])
         return True
 
 
@@ -249,10 +254,8 @@ class KeySeqvParser:
             return
 
         matches = self._key_seqv_regex.findall(line)
-        is_special = False
 
         for match in matches:
-            # TODO: hold delay
             # wait delay <DELAY [time_in_ms]>
             if match[Groups.DELAY_WAIT_ORIGINAL.value]:
                 # finish previous sequence and add delay to the new one
@@ -266,13 +269,6 @@ class KeySeqvParser:
                 self._lof_keyseqvs.append(KeySeqv(**self._ks_struct))
                 self._log_seqv_content()
                 self.__new_sequece_structure()
-                is_special = False
-
-            # checks if previous sequence was special one
-            # if so push that
-            if is_special:
-                self._push_pressed_and_released()
-                is_special = False
 
             # max 6 keys pressed are allowed to be sent at the same time
             if len(self._ks_struct['keys']) > 5:
@@ -284,8 +280,13 @@ class KeySeqvParser:
                 if self._ks_struct['keys']:
                     self._push_pressed_and_released()
                 # if hold delay is defined push it immediately
-                # if self._ks_struct['delay'] > 0:
-                is_special = self._check_special_sequence(match, line_index)
+                if not self._check_special_sequence(match, line_index):
+                    # TODO: exception
+                    continue
+                if self._ks_struct['delay'] > 0:
+                    self._lof_keyseqvs.append(KeySeqv(**self._ks_struct))
+                    self._log_seqv_content()
+                    self.__new_sequece_structure()
 
             # ignoring comments [everything that start with # character]
             if match[Groups.COMMENT.value]:
