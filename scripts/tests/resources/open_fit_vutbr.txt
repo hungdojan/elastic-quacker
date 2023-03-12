@@ -1,0 +1,4 @@
+# this file will open terminal using alt-enter shortcut
+<a-\enter><DELAY 500>
+# and open 'fit.vutbr.cz' on firefox web browser
+firefox fit.vutbr.cz<\enter>

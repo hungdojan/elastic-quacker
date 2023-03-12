@@ -311,7 +311,7 @@ class KeySeqvParser:
             raise NonReadableCharacterError()
 
         matches = self._key_seqv_regex.findall(line)
-        hold_delay_toggle = False
+        is_special_seqv = False
 
         for match in matches:
             # wait delay <DELAY [time_in_ms]>
@@ -327,12 +327,12 @@ class KeySeqvParser:
                 self._lof_keyseqvs.append(KeySeqv(**self._ks_struct))
                 self._log_seqv_content()
                 self.__new_sequece_structure()
-                hold_delay_toggle = False
+                is_special_seqv = False
 
-            if hold_delay_toggle:
+            if is_special_seqv:
                 self._lof_keyseqvs.append(KeySeqv(**self._ks_struct))
                 self.__new_sequece_structure()
-                hold_delay_toggle = False
+                is_special_seqv = False
 
             # max 6 keys pressed are allowed to be sent at the same time
             if len(self._ks_struct['keys']) > 5:
@@ -346,12 +346,11 @@ class KeySeqvParser:
 
                 self._check_special_sequence(match, line_index)
 
-                # if hold delay is defined push it immediately
-                if self._ks_struct['delay'] > 0:
-                    self._lof_keyseqvs.append(KeySeqv(**self._ks_struct))
-                    self._log_seqv_content()
-                    self.__new_sequece_structure()
-                    hold_delay_toggle = True
+                # push but wait for delay
+                is_special_seqv = True
+                self._lof_keyseqvs.append(KeySeqv(**self._ks_struct))
+                self._log_seqv_content()
+                self.__new_sequece_structure()
 
             # ignoring comments [everything that start with # character]
             if match[Groups.COMMENT.value]:
@@ -366,6 +365,6 @@ class KeySeqvParser:
         if self._ks_struct['keys']:
             self._push_pressed_and_released()
 
-        if hold_delay_toggle:
+        if is_special_seqv:
             self._lof_keyseqvs.append(KeySeqv(**self._ks_struct))
             self.__new_sequece_structure()
