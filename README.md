@@ -33,11 +33,16 @@ RubberDucky_BachelorThesis
 │   └── usb_reports.h
 └── scripts
     ├── parser-cli.py
-    └── rd_parser
-        ├── __init__.py
-        ├── error.py
-        ├── key_seqv.py
-        ├── key_seqv_parser.py
-        ├── mappings.py
-        └── regex_groups.py
+    ├── rd_parser
+    │   ├── __init__.py
+    │   ├── error.py
+    │   ├── key_seqv.py
+    │   ├── key_seqv_parser.py
+    │   ├── mappings.py
+    │   └── regex_groups.py
+    └── tests
+        ├── resources
+        │   └── open_fit_vutbr.txt
+        └── test_rd_parser.py
+
 ```
