@@ -1,9 +1,10 @@
+import os
 import pytest
 
 from rd_parser.error import KeySequenceSizeExceededError, NonReadableCharacterError, ShiftToggleWithNormalKeyError, SpecialSequenceShiftToggleError, UndefinedSpecialKeyNameError, UnknownModifierError
 from rd_parser.mappings import normal_mapping, shift_mapping
 from rd_parser.key_seqv import KeySeqv, Modifier, Key
-from rd_parser.key_seqv_parser import KeySeqvParser, modifier_mapping
+from rd_parser.key_seqv_parser import KeySeqvParser
 
 @pytest.fixture()
 def ksp() -> KeySeqvParser:
@@ -153,32 +154,32 @@ def test_delay(ksp: KeySeqvParser):
 
 
 def test_special_key(ksp: KeySeqvParser):
-    test_str = [r'<\enter>', r'\enter', r'<\esc><\bs><\gt><\lt>', r'<\CAPS_LOCK><\arrow_UP>']
+    test_str = [r'<\enter>a', r'\enter', r'<\esc><\bs><\gt><\lt>', r'<\CAPS_LOCK><\arrow_UP>']
     for i, s in enumerate(test_str):
         ksp.parse_line(s, i)
 
     ks_pressed = [ks for ks in ksp.lof_keyseqvs if ks.keys]
-    assert len(ks_pressed) == 9
+    assert len(ks_pressed) == 10
 
     # first line
     assert len(ks_pressed[0].keys) == 1
     assert Key.KEY_ENTER in ks_pressed[0].keys
 
     # second line
-    assert len(ks_pressed[1].keys) == 4
-    assert len(ks_pressed[2].keys) == 2
+    assert len(ks_pressed[2].keys) == 4
+    assert len(ks_pressed[3].keys) == 2
 
     # third line
-    assert Key.KEY_ESCAPE in ks_pressed[3].keys
-    assert Key.KEY_BACKSPACE in ks_pressed[4].keys
-    assert (Key.KEY_PERIOD in ks_pressed[5].keys and
-            Modifier.LSHIFT in ks_pressed[5].modifiers)
-    assert (Key.KEY_COMMA in ks_pressed[6].keys and
+    assert Key.KEY_ESCAPE in ks_pressed[4].keys
+    assert Key.KEY_BACKSPACE in ks_pressed[5].keys
+    assert (Key.KEY_PERIOD in ks_pressed[6].keys and
             Modifier.LSHIFT in ks_pressed[6].modifiers)
+    assert (Key.KEY_COMMA in ks_pressed[7].keys and
+            Modifier.LSHIFT in ks_pressed[7].modifiers)
 
     # forth line
-    assert Key.KEY_CAPS_LOCK in ks_pressed[7].keys
-    assert Key.KEY_ARROW_UP in ks_pressed[8].keys
+    assert Key.KEY_CAPS_LOCK in ks_pressed[8].keys
+    assert Key.KEY_ARROW_UP in ks_pressed[9].keys
 
 
 def test_comments(ksp: KeySeqvParser):
@@ -359,3 +360,26 @@ def test_last_and_clear(ksp: KeySeqvParser):
 
     ksp.clear_lof_keyseqvs()
     assert len(ksp.lof_keyseqvs) == 0
+
+
+def test_file(ksp: KeySeqvParser):
+    # TODO: path
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(f'{dir_path}/resources/open_fit_vutbr.txt', 'r') as f:
+        for i, line in enumerate(f):
+            ksp.parse_line(line, i)
+    ksp.set_last()
+
+    ks_pressed = [ks for ks in ksp.lof_keyseqvs if ks.keys]
+    assert len(ks_pressed) == 6
+
+    # first (non comment) line
+    assert len(ks_pressed[0].modifiers) == 1 and Modifier.LALT in ks_pressed[0].modifiers
+    assert len(ks_pressed[0].keys) == 1 and Key.KEY_ENTER in ks_pressed[0].keys
+
+    # second (non comment) line
+    assert len(ks_pressed[1].keys) == 4 # 'fire'
+    assert len(ks_pressed[2].keys) == 4 # 'fox '
+    assert len(ks_pressed[3].keys) == 6 # 'fit.vu'
+    assert len(ks_pressed[4].keys) == 6 # 'tbr.cz'
+    assert len(ks_pressed[5].keys) == 1 and Key.KEY_ENTER in ks_pressed[5].keys
