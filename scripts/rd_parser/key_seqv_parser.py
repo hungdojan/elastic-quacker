@@ -29,6 +29,16 @@ class KeySeqvParser:
         return tuple(self._lof_keyseqvs)
 
 
+    @property
+    def verbose(self) -> bool:
+        return self._verbose
+
+
+    @verbose.setter
+    def verbose(self, value):
+        self._verbose = value
+
+
     def __compile_patterns(self):
         self._line_regex = re.compile(LINE_REGEX)
         self._key_seqv_regex = re.compile(KEY_SEQV_REGEX)
@@ -37,6 +47,13 @@ class KeySeqvParser:
     def clear_lof_keyseqvs(self):
         """Clear the set of key sequences."""
         self._lof_keyseqvs.clear()
+
+
+    def set_last(self):
+        """Set last item's last flag."""
+        if self._lof_keyseqvs:
+            last_item = self._lof_keyseqvs[-1]
+            last_item.last = True
 
 
     def __new_sequece_structure(self):
@@ -90,6 +107,11 @@ class KeySeqvParser:
 
 
     def _parse_normal_keys(self, value: str):
+        """Parsing normal keys.
+
+        Args:
+            value (str): Key value to parse.
+        """
         # check if symbol requires shift modifier
         if value in shift_mapping or value.isupper():
             key_macro_name = normal_mapping[shift_mapping[value]] \
@@ -129,6 +151,20 @@ class KeySeqvParser:
 
     def _parse_normal_keys_in_special(self, match: list,
                                       line_index: int) -> tuple[bool, list[Key]]:
+        """Parsing normal key sequence inside special sequence.
+
+        Args:
+            match (list): Regex's list of matches (output of findall).
+            line_index (int): Line's index (used in logging).
+
+        Raises:
+            SpecialSequenceShiftToggleError: Inconsistent shift toggle;
+                            some normal keys require shift modifier and some don't.
+
+        Returns:
+            tuple[bool, list[Key]]: First value tells parser that shift modifier is used.
+                                    Second value contains a list of pressed keys.
+        """
         keys = match[Groups.SPECIAL_VALUE.value]
         keys_pressed = []
         is_shift_toggled = False
@@ -138,16 +174,16 @@ class KeySeqvParser:
 
             # shift keys
             if (is_shift_toggled and (key in shift_mapping or key.isupper())):
-                key_macro_name = normal_mapping[shift_mapping[key]] \
-                                 if key in shift_mapping else \
-                                 normal_mapping[key.lower()]
+                key_name = normal_mapping[shift_mapping[key]] \
+                           if key in shift_mapping else \
+                           normal_mapping[key.lower()]
                 # the key is already pressed
-                if key_macro_name in keys_pressed:
+                if key_name in keys_pressed:
                     self._create_log(logging.WARN,
                                      f'The key "{key}" is pressed multiple times in ' \
                                      f'"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
                     continue
-                keys_pressed.append(key_macro_name)
+                keys_pressed.append(key_name)
             # non-shift keys
             elif (not is_shift_toggled and key not in shift_mapping and not key.isupper()):
                 # the key is already pressed
@@ -162,11 +198,23 @@ class KeySeqvParser:
                                  'Inconsistent use of shift modifier in ' \
                                  f'"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}!')
                 raise SpecialSequenceShiftToggleError()
-                # return False, []
         return is_shift_toggled, keys_pressed
 
 
-    def _check_special_sequence(self, match: list, line_index: int) -> bool:
+    def _check_special_sequence(self, match: list, line_index: int):
+        """Parsing special sequences.
+
+        Args:
+            match (list): Regex's list of matches (output of findall).
+            line_index (int): Line's index (used in logging).
+
+        Raises:
+            UnknownModifierError: Parser came across unknown modifier.
+            UndefinedSpecialKeyNameError: Parser came across unknown special key.
+            KeySequenceSizeExceededError: Special sequence of normal keys exceeded max limit.
+            ShiftToggleWithNormalKeyError: Shift modifier cannot be present together with normal key sequence.
+            ParserError: Any other error related to parsing.
+        """
         used_modifiers: list[Modifier] = []
         if match[Groups.SPECIAL_MODIFIERS.value]:
             # extracts modifiers
@@ -195,7 +243,7 @@ class KeySeqvParser:
                 self._ks_struct['modifiers'] = used_modifiers
                 if match[Groups.SPECIAL_HOLD_DELAY.value]:
                     self._ks_struct['delay'] = int(match[Groups.SPECIAL_HOLD_DELAY.value])
-                return True
+                return
             # macro key (like gt or lt)
             if special_value.lower() in macro_keys:
                 # add shift if not toggled yet
@@ -207,7 +255,7 @@ class KeySeqvParser:
                 self._ks_struct['modifiers'] = used_modifiers
                 if match[Groups.SPECIAL_HOLD_DELAY.value]:
                     self._ks_struct['delay'] = int(match[Groups.SPECIAL_HOLD_DELAY.value])
-                return True
+                return
             self._create_log(logging.ERROR,
                              f'Unknown special key value "{special_value}" in ' \
                              f'"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
@@ -240,10 +288,21 @@ class KeySeqvParser:
         self._ks_struct['keys'] = keys_pressed
         if match[Groups.SPECIAL_HOLD_DELAY.value]:
             self._ks_struct['delay'] = int(match[Groups.SPECIAL_HOLD_DELAY.value])
-        return True
 
 
     def parse_line(self, line: str, line_index: int):
+        """Parses the given line to create KeySeqv objects.
+
+        Created objects are stored in KeySeqvParser.lof_keyseqvs.
+
+        Args:
+            line (str): Line content
+            line_index (int): Line's index (used in logging).
+
+        Raises:
+            NonReadableCharacterError: The line contains non ASCII printable character.
+            ParserError: Any other error related to parsing.
+        """
 
         if not self._line_regex.match(line):
             self._create_log(logging.ERROR,
@@ -252,6 +311,7 @@ class KeySeqvParser:
             raise NonReadableCharacterError()
 
         matches = self._key_seqv_regex.findall(line)
+        hold_delay_toggle = False
 
         for match in matches:
             # wait delay <DELAY [time_in_ms]>
@@ -267,6 +327,12 @@ class KeySeqvParser:
                 self._lof_keyseqvs.append(KeySeqv(**self._ks_struct))
                 self._log_seqv_content()
                 self.__new_sequece_structure()
+                hold_delay_toggle = False
+
+            if hold_delay_toggle:
+                self._lof_keyseqvs.append(KeySeqv(**self._ks_struct))
+                self.__new_sequece_structure()
+                hold_delay_toggle = False
 
             # max 6 keys pressed are allowed to be sent at the same time
             if len(self._ks_struct['keys']) > 5:
@@ -285,6 +351,7 @@ class KeySeqvParser:
                     self._lof_keyseqvs.append(KeySeqv(**self._ks_struct))
                     self._log_seqv_content()
                     self.__new_sequece_structure()
+                    hold_delay_toggle = True
 
             # ignoring comments [everything that start with # character]
             if match[Groups.COMMENT.value]:
@@ -299,9 +366,6 @@ class KeySeqvParser:
         if self._ks_struct['keys']:
             self._push_pressed_and_released()
 
-
-    def set_last(self):
-        """Set last item's last flag."""
-        if self._lof_keyseqvs:
-            last_item = self._lof_keyseqvs[-1]
-            last_item.last = True
+        if hold_delay_toggle:
+            self._lof_keyseqvs.append(KeySeqv(**self._ks_struct))
+            self.__new_sequece_structure()
