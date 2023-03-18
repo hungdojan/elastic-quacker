@@ -2,7 +2,7 @@ import os
 import pytest
 
 from rd_client.parser.error import KeySequenceSizeExceededError, NonReadableCharacterError, ShiftToggleWithNormalKeyError, SpecialSequenceShiftToggleError, UndefinedSpecialKeyNameError, UnknownModifierError
-from rd_client.parser.mappings import normal_mapping, shift_mapping
+from rd_client.parser.mappings import NORMAL_TO_KEY_MAP, SHIFT_TO_NORMAL_MAP
 from rd_client.parser.key_seqv import KeySeqv, Modifier, Key
 from rd_client.parser.key_seqv_parser import KeySeqvParser
 
@@ -56,21 +56,21 @@ def test_normal_key(ksp: KeySeqvParser):
 
     # first line
     assert len(key_presses[0]) == 1
-    assert set(key_presses[0]) == {normal_mapping[test_str[0]],}
+    assert set(key_presses[0]) == {NORMAL_TO_KEY_MAP[test_str[0]],}
 
     # second line; [multip, le]
     assert len(key_presses[1]) == 6
-    assert set(key_presses[1]) == set([normal_mapping[x] for x in test_str[1][:6]])
+    assert set(key_presses[1]) == set([NORMAL_TO_KEY_MAP[x] for x in test_str[1][:6]])
     assert len(key_presses[2]) == 2
 
     # third line; [do, odle]
     assert len(key_presses[3]) == 2
     assert len(key_presses[4]) == 4
-    assert set(key_presses[4]) == set([normal_mapping[x] for x in test_str[2][2:]])
+    assert set(key_presses[4]) == set([NORMAL_TO_KEY_MAP[x] for x in test_str[2][2:]])
 
     # forth line; [',.']
     assert len(key_presses[5]) == 2
-    assert set(key_presses[5]) == set([normal_mapping[x] for x in test_str[3]])
+    assert set(key_presses[5]) == set([NORMAL_TO_KEY_MAP[x] for x in test_str[3]])
 
 
 def test_normal_key_shift(ksp: KeySeqvParser):
@@ -84,23 +84,23 @@ def test_normal_key_shift(ksp: KeySeqvParser):
 
     # first line
     assert len(key_presses[0].keys) == 1
-    assert set(key_presses[0].keys) == {normal_mapping[test_str[0].lower()],}
+    assert set(key_presses[0].keys) == {NORMAL_TO_KEY_MAP[test_str[0].lower()],}
     assert Modifier.LSHIFT in key_presses[0].modifiers
 
     # second line; [multip, le]
     assert len(key_presses[1].keys) == 6
     assert Modifier.LSHIFT in key_presses[1].modifiers
-    assert set(key_presses[1].keys) == set([normal_mapping[x.lower()] for x in test_str[1][:6]])
+    assert set(key_presses[1].keys) == set([NORMAL_TO_KEY_MAP[x.lower()] for x in test_str[1][:6]])
     assert len(key_presses[2].keys) == 2
 
     # third line; [do, odle]
     assert len(key_presses[3].keys) == 2
     assert len(key_presses[4].keys) == 4
-    assert set(key_presses[4].keys) == set([normal_mapping[x.lower()] for x in test_str[2][2:]])
+    assert set(key_presses[4].keys) == set([NORMAL_TO_KEY_MAP[x.lower()] for x in test_str[2][2:]])
 
     # forth line; ['{}']
     assert len(key_presses[5].keys) == 2
-    assert set(key_presses[5].keys) == set([normal_mapping[shift_mapping[x]] for x in test_str[3]])
+    assert set(key_presses[5].keys) == set([NORMAL_TO_KEY_MAP[SHIFT_TO_NORMAL_MAP[x]] for x in test_str[3]])
 
 
 def test_normal_key_combined(ksp: KeySeqvParser):
@@ -189,7 +189,7 @@ def test_comments(ksp: KeySeqvParser):
     assert len(ks_pressed) == 2
 
     # first line
-    assert normal_mapping[shift_mapping['#']] not in ks_pressed[0].keys
+    assert NORMAL_TO_KEY_MAP[SHIFT_TO_NORMAL_MAP['#']] not in ks_pressed[0].keys
 
     # second line
     assert len(ks_pressed[0].keys) == 1
@@ -197,7 +197,7 @@ def test_comments(ksp: KeySeqvParser):
 
     # third line
     assert len(ks_pressed[1].keys) == 1
-    assert (normal_mapping[shift_mapping['#']] in ks_pressed[1].keys and
+    assert (NORMAL_TO_KEY_MAP[SHIFT_TO_NORMAL_MAP['#']] in ks_pressed[1].keys and
             Modifier.LSHIFT in ks_pressed[1].modifiers)
 
 
@@ -211,12 +211,12 @@ def test_special_sequence(ksp: KeySeqvParser):
 
     # first line
     assert len(ks_pressed[0].keys) == 6
-    assert set(ks_pressed[0].keys) == set([normal_mapping[x] for x in test_str[0][1:-1]])
+    assert set(ks_pressed[0].keys) == set([NORMAL_TO_KEY_MAP[x] for x in test_str[0][1:-1]])
 
     # second line
     assert len(ks_pressed[1].keys) == 3
     assert (Modifier.LSHIFT in ks_pressed[1].modifiers and
-            set(ks_pressed[1].keys) == set([normal_mapping[x.lower()]
+            set(ks_pressed[1].keys) == set([NORMAL_TO_KEY_MAP[x.lower()]
                                             for x in test_str[1][1:-1]]))
 
     # third line

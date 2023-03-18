@@ -88,7 +88,7 @@ class KeySeqvParser:
             out_str += f'Modifiers: [{modifiers}]; '
         # log keys
         if self._ks_struct['keys']:
-            keys = ', '.join([mapping_keys[mapping_values.index(x)]
+            keys = ', '.join([MAPPING_KEYS[MAPPING_VALUES.index(x)]
                               for x in self._ks_struct['keys']])
             out_str += f'Keys: [{keys}]'
         # write into log
@@ -113,10 +113,10 @@ class KeySeqvParser:
             value (str): Key value to parse.
         """
         # check if symbol requires shift modifier
-        if value in shift_mapping or value.isupper():
-            key_macro_name = normal_mapping[shift_mapping[value]] \
-                             if value in shift_mapping else \
-                             normal_mapping[value.lower()]
+        if value in SHIFT_TO_NORMAL_MAP or value.isupper():
+            key_macro_name = NORMAL_TO_KEY_MAP[SHIFT_TO_NORMAL_MAP[value]] \
+                             if value in SHIFT_TO_NORMAL_MAP else \
+                             NORMAL_TO_KEY_MAP[value.lower()]
             # first check if the key is already being pressed
             # if so we need to release it first (push current sequence)
             # and press it again
@@ -135,7 +135,7 @@ class KeySeqvParser:
             self._ks_struct['keys'].append(key_macro_name)
 
         else:
-            key_macro_name = normal_mapping[value]
+            key_macro_name = NORMAL_TO_KEY_MAP[value]
             # first check if the key is already being pressed
             # if so we need to release it first (push current sequence)
             # and press it again
@@ -146,7 +146,7 @@ class KeySeqvParser:
             if Modifier.LSHIFT in self._ks_struct['modifiers'] or \
                Modifier.RSHIFT in self._ks_struct['modifiers']:
                 self._push_pressed_and_released()
-            self._ks_struct['keys'].append(normal_mapping[value])
+            self._ks_struct['keys'].append(NORMAL_TO_KEY_MAP[value])
 
 
     def _parse_normal_keys_in_special(self, match: list,
@@ -170,13 +170,13 @@ class KeySeqvParser:
         is_shift_toggled = False
         for i, key in enumerate(keys):
             if i == 0:
-                is_shift_toggled = key in shift_mapping or key.isupper()
+                is_shift_toggled = key in SHIFT_TO_NORMAL_MAP or key.isupper()
 
             # shift keys
-            if (is_shift_toggled and (key in shift_mapping or key.isupper())):
-                key_name = normal_mapping[shift_mapping[key]] \
-                           if key in shift_mapping else \
-                           normal_mapping[key.lower()]
+            if (is_shift_toggled and (key in SHIFT_TO_NORMAL_MAP or key.isupper())):
+                key_name = NORMAL_TO_KEY_MAP[SHIFT_TO_NORMAL_MAP[key]] \
+                           if key in SHIFT_TO_NORMAL_MAP else \
+                           NORMAL_TO_KEY_MAP[key.lower()]
                 # the key is already pressed
                 if key_name in keys_pressed:
                     self._create_log(logging.WARN,
@@ -185,14 +185,14 @@ class KeySeqvParser:
                     continue
                 keys_pressed.append(key_name)
             # non-shift keys
-            elif (not is_shift_toggled and key not in shift_mapping and not key.isupper()):
+            elif (not is_shift_toggled and key not in SHIFT_TO_NORMAL_MAP and not key.isupper()):
                 # the key is already pressed
-                if normal_mapping[key] in keys_pressed:
+                if NORMAL_TO_KEY_MAP[key] in keys_pressed:
                     self._create_log(logging.WARN,
                                      f'The key "{key}" is pressed multiple times in ' \
                                      f'"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
                     continue
-                keys_pressed.append(normal_mapping[key])
+                keys_pressed.append(NORMAL_TO_KEY_MAP[key])
             else:
                 self._create_log(logging.ERROR,
                                  'Inconsistent use of shift modifier in ' \
@@ -220,34 +220,34 @@ class KeySeqvParser:
             # extracts modifiers
             seqv_modifiers = match[Groups.SPECIAL_MODIFIERS.value].split('-')[:-1]
             for m in seqv_modifiers:
-                if not modifier_mapping.get(m.lower()):
+                if not MODIFIER_MAP.get(m.lower()):
                     self._create_log(logging.ERROR,
                                      f'Unexpected modifier "{m}" in "{match[Groups.SPECIAL_ORIGINAL.value]}" ' \
                                      f'on line {line_index+1}!')
                     raise UnknownModifierError()
-                if modifier_mapping[m.lower()] in used_modifiers:
+                if MODIFIER_MAP[m.lower()] in used_modifiers:
                     self._create_log(logging.WARN,
                                      f'Duplicate use of modifier "{m}" in ' \
                                      f'"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
                     continue
-                used_modifiers.append(modifier_mapping[m.lower()])
+                used_modifiers.append(MODIFIER_MAP[m.lower()])
 
         special_value: str = match[Groups.SPECIAL_VALUE.value]
         # the escape sign on this position tells the parser that
         # the next set of characters defines a special keys name
-        # (special_mapping or macro_keys)
+        # (SPECIAL_MAP or MACRO_KEYS)
         if match[Groups.SPECIAL_ESCAPE_EN.value]:
             # special key (like escape or return)
-            if special_value.lower() in special_mapping:
-                self._ks_struct['keys'].append(special_mapping[special_value.lower()])
+            if special_value.lower() in SPECIAL_MAP:
+                self._ks_struct['keys'].append(SPECIAL_MAP[special_value.lower()])
                 self._ks_struct['modifiers'] = used_modifiers
                 if match[Groups.SPECIAL_HOLD_DELAY.value]:
                     self._ks_struct['delay'] = int(match[Groups.SPECIAL_HOLD_DELAY.value])
                 return
             # macro key (like gt or lt)
-            if special_value.lower() in macro_keys:
+            if special_value.lower() in MACRO_KEYS:
                 # add shift if not toggled yet
-                key_modifier, key_value = macro_keys[special_value.lower()]
+                key_modifier, key_value = MACRO_KEYS[special_value.lower()]
                 if key_modifier and key_modifier not in used_modifiers:
                     used_modifiers.append(key_modifier)
 
