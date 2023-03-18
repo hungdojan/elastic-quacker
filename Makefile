@@ -28,7 +28,7 @@ export_req:
 	poetry export --without-hashes --format=requirements.txt > requirements.txt
 
 run_cli:
-	poetry run cli
+	poetry run cli -v
 
 run_client:
 	poetry run client

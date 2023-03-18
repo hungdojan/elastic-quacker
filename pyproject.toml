@@ -41,8 +41,15 @@ pytest-sugar = "^0.9.6"
 [tool.coverage.html]
 directory = "tests/reports/htmlcov"
 
+# coverage run configuration
+[tool.coverage.run]
+omit = [
+  "rd_client/socket/*",
+  "tests/*"
+]
+
 # pytest options
 [tool.pytest.ini_options]
 testpaths = [
-    "tests",
+  "tests",
 ]
