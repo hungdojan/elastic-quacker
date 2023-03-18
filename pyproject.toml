@@ -1,5 +1,48 @@
-[project]
-name = "Rubber Ducky parser"
+# backend system
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
+# project info
+[tool.poetry]
+name = "rd-client"
+version = "0.1.0"
+description = ""
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/hungdojan/RubberDucky_BachelorThesis"
+authors = [
+  "Hung Do <hungdojan@gmail.com>"
+]
+packages = [
+  {include = "rd_client"},
+]
+
+# project dependencies
+[tool.poetry.dependencies]
+python = "^3.7"
+
+# executable scripts
+[tool.poetry.scripts]
+cli = "rd_client.__main__:main"
+
+# tests setup
+[tool.poetry.group.test.dependencies]
+coverage = "^7.1.0"
+hypothesis = "^6.65.2"
+pytest = "^7.2.1"
+pytest-cov = "^4.0.0"
+pytest-html = "^3.0.0"
+pytest-mock = "^3.10.0"
+pytest-picked = "^0.4.6"
+pytest-sugar = "^0.9.6"
+
+# html coverage configuration
+[tool.coverage.html]
+directory = "tests/reports/htmlcov"
+
+# pytest options
 [tool.pytest.ini_options]
-addopts="--ignore=pico-sdk --html=reports/test_report.html --self-contained-html --cov-report html:reports/htmlcov --cov-report term --cov=rd_parser --cov=rd_client"
+testpaths = [
+    "tests",
+]

@@ -1,10 +1,10 @@
 import os
 import pytest
 
-from rd_parser.error import KeySequenceSizeExceededError, NonReadableCharacterError, ShiftToggleWithNormalKeyError, SpecialSequenceShiftToggleError, UndefinedSpecialKeyNameError, UnknownModifierError
-from rd_parser.mappings import normal_mapping, shift_mapping
-from rd_parser.key_seqv import KeySeqv, Modifier, Key
-from rd_parser.key_seqv_parser import KeySeqvParser
+from rd_client.parser.error import KeySequenceSizeExceededError, NonReadableCharacterError, ShiftToggleWithNormalKeyError, SpecialSequenceShiftToggleError, UndefinedSpecialKeyNameError, UnknownModifierError
+from rd_client.parser.mappings import normal_mapping, shift_mapping
+from rd_client.parser.key_seqv import KeySeqv, Modifier, Key
+from rd_client.parser.key_seqv_parser import KeySeqvParser
 
 @pytest.fixture()
 def ksp() -> KeySeqvParser:
@@ -40,10 +40,7 @@ def test_key_seqv():
 
 
 def test_empty_list(ksp: KeySeqvParser):
-    try:
-        ksp.set_last()
-    except Exception:
-        pytest.fail('Empty list set last failed.')
+    ksp.set_last()
 
     assert len(ksp.lof_keyseqvs) == 0
 

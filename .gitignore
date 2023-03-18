@@ -9,8 +9,11 @@ pico_sdk_import.cmake
 doc/
 .ccls-cache/
 build/
+pico_build/
 .venv/
 __pycache__/
 .vscode/
 .cache/
 reports/
+dist/
+poetry.lock

@@ -9,40 +9,41 @@ Year: 2022/2023
 ## Project tree
 ```
 RubberDucky_BachelorThesis
+.
 ├── CMakeLists.txt
 ├── Makefile
 ├── pico-sdk
 │   └── ...
+├── pyproject.toml
+├── rd_client
+│   ├── __init__.py
+│   ├── __main__.py
+│   └── parser
+│       ├── error.py
+│       ├── __init__.py
+│       ├── key_seqv_parser.py
+│       ├── key_seqv.py
+│       ├── mappings.py
+│       └── regex_groups.py
 ├── README.md
 ├── requirements.txt
 ├── rubber_ducky
-│   ├── CMakeLists.txt
-│   ├── error_state.c
-│   ├── error_state.h
-│   ├── keyseqv
-│   │   ├── key_seqv.h
-│   │   ├── key_seqv.c
-│   │   ├── key_seqv_linux.c
-│   │   └── key_seqv_win.c
-│   ├── main.c
-│   ├── msc.c
-│   ├── msc.h
-│   ├── tusb_config.h
-│   ├── usb_descriptors.c
-│   ├── usb_reports.c
-│   └── usb_reports.h
-└── scripts
-    ├── parser-cli.py
-    ├── rd_parser
-    │   ├── __init__.py
-    │   ├── error.py
-    │   ├── key_seqv.py
-    │   ├── key_seqv_parser.py
-    │   ├── mappings.py
-    │   └── regex_groups.py
-    └── tests
-        ├── resources
-        │   └── open_fit_vutbr.txt
-        └── test_rd_parser.py
-
+│   ├── CMakeLists.txt
+│   ├── error_state.c
+│   ├── error_state.h
+│   ├── keyseqv
+│   │   ├── key_seqv.c
+│   │   ├── key_seqv.h
+│   │   ├── key_seqv_linux.c
+│   │   └── key_seqv_win.c
+│   ├── main.c
+│   ├── msc.c
+│   ├── tusb_config.h
+│   ├── usb_descriptors.c
+│   ├── usb_general.h
+│   └── usb_reports.c
+└── tests
+    ├── resources
+    │   └── open_fit_vutbr.txt
+    └── test_parser.py
 ```

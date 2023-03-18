@@ -1,10 +1,10 @@
 # C project: Bachelor Thesis
-BUILD_DIR=./build
+BUILD_DIR=./pico_build
 OS_NAME="Linux"
 
 ##############################################
 
-.PHONY: build rubber_ducky doc test test_coverage pack clean
+.PHONY: build rubber_ducky doc pack clean
 
 all: build
 
@@ -17,18 +17,27 @@ rubber_ducky: $(BUILD_DIR)/Makefile
 doc: Doxygen
 	doxygen
 
-pack: src/* README.md Makefile CMakeLists.txt Doxygen
-	rm -f *.zip
-	zip -r $(TARGET_NAME) $^
+clean:
+	rm -rf doc *.zip $(BUILD_DIR) .coverage tests/reports/
+
+####### RD Client python commands ############
+
+.PHONY: export_req test test_show_coverage
+
+export_req:
+	poetry export --without-hashes --format=requirements.txt > requirements.txt
+
+run_cli:
+	poetry run cli
+
+run_client:
+	poetry run client
 
 test:
-	cd scripts/tests/ && pytest
+	poetry run coverage run -m pytest && poetry run coverage report -m && poetry run coverage html
 
-test_coverage: test
-	firefox scripts/tests/reports/htmlcov/index.html
-
-clean:
-	rm -rf doc *.zip $(BUILD_DIR)
+test_show_coverage: test
+	firefox tests/reports/htmlcov/index.html
 
 ##############################################
 

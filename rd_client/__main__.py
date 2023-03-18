@@ -4,8 +4,8 @@ import logging
 import sys
 
 from datetime import datetime
-from rd_parser.error import ErrorCode
-from rd_parser.key_seqv_parser import KeySeqvParser
+from .parser.error import ErrorCode
+from .parser.key_seqv_parser import KeySeqvParser
 
 
 HEADER_CONTENT = \
