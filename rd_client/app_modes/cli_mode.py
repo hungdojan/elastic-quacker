@@ -22,7 +22,6 @@ HEADER_CONTENT = \
 
 /// List of key sequences for (my) Linux system
 struct key_seqv_t key_seqvs[] = {{
-    INITIAL_DELAY,
 """.format(datetime.strftime(datetime.today(), '%d/%m/%Y'))
 
 FOOTER_CONTENT = \

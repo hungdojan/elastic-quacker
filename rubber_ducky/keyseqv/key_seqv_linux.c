@@ -13,12 +13,8 @@
  */
 #include "key_seqv.h"
 
-/// Index of the key sequence to send
-// static size_t key_seqv_index = 0;
-
 /// List of key sequences for (my) Linux system
 struct key_seqv_t key_seqvs[] = {
-    INITIAL_DELAY,
 
     {  0, {KEYBOARD_MODIFIER_LEFTALT, 0, {HID_KEY_ENTER, 0,}}, false},
     {500, {0, 0, {0,}}, false},
