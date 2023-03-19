@@ -33,6 +33,7 @@ uint32_t send_report() {
     uint8_t *keycode = key_sqv.report.keycode[0] ?
                        key_sqv.report.keycode : NULL;
 
+    // TODO: function `tud_hid_n_report` might enable custom reports
     // increase counter when report was successfully sent
     if (tud_hid_keyboard_report(0, key_sqv.report.modifier, keycode)) {
         key_seqv_increase_counter();
@@ -49,7 +50,7 @@ int main(void) {
         return 1;
 
     // initial booting delay
-    for (int i = 0; i < 500000; i++)
+    for (int i = 0; i < 1500000; i++)
         tud_task(); // tinyusb device task
 
     // main program loop
