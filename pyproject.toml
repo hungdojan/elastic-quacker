@@ -24,7 +24,7 @@ python = "^3.7"
 
 # executable scripts
 [tool.poetry.scripts]
-cli = "rd_client.__main__:main"
+app = "rd_client.__main__:main"
 
 # tests setup
 [tool.poetry.group.test.dependencies]
