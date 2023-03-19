@@ -1,3 +1,4 @@
+import logging
 import sys
 
 from .base import BaseMode
@@ -49,13 +50,18 @@ class CliMode(BaseMode):
     def run(self):
         ksp = KeySeqvParser(self._verbose)
 
+        self._log_msg(logging.INFO, "------ Start parsing script ------")
+        # parse the file/from stdin
         with self._in_f as f:
             for i, line in enumerate(f):
                 ksp.parse_line(line, i)
         ksp.set_last()
 
+        self._log_msg(logging.INFO, "------- Writing to output -------")
+        # write into output file/stdout
         with self._out_f as f:
             f.write(HEADER_CONTENT)
             for ks in ksp.lof_keyseqvs:
                 f.write(str(ks))
             f.write(FOOTER_CONTENT)
+        self._log_msg(logging.INFO, "-------- Writing finished --------")

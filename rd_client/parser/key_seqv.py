@@ -37,8 +37,6 @@ class KeySeqv:
 
     def to_bytes(self) -> bytearray:
         _b = bytearray()
-        # starting byte 0xd0
-        _b.append(0xd0)
 
         # delay
         _b.extend(self.delay.to_bytes(4, 'little'))
@@ -59,8 +57,6 @@ class KeySeqv:
         # last
         _b.append(self.last)
 
-        # ending byte 0xd0
-        _b.append(0xd0)
         return _b
 
 

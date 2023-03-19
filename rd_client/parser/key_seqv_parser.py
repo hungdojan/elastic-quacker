@@ -24,7 +24,7 @@ class KeySeqvParser:
 
 
     @property
-    def lof_keyseqvs(self) -> tuple[KeySeqv]:
+    def lof_keyseqvs(self) -> tuple[KeySeqv, ...]:
         """Returns set of key sequences."""
         return tuple(self._lof_keyseqvs)
 

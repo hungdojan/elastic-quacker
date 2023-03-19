@@ -34,10 +34,10 @@ run_client:
 	poetry run app -vn -p 5001 -H 127.0.0.1
 
 test:
-	poetry run coverage run -m pytest && poetry run coverage report -m && poetry run coverage html
+	poetry run coverage run -m pytest -vv && poetry run coverage report -m
 
 test_show_coverage: test
-	firefox tests/reports/htmlcov/index.html
+	poetry run coverage html && firefox tests/reports/htmlcov/index.html
 
 ##############################################
 
