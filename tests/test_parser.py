@@ -1,8 +1,15 @@
 import os
 import pytest
 
-from rd_client.parser.error import KeySequenceSizeExceededError, NonReadableCharacterError, ShiftToggleWithNormalKeyError, SpecialSequenceShiftToggleError, UndefinedSpecialKeyNameError, UnknownModifierError
-from rd_client.parser.mappings import NORMAL_TO_KEY_MAP, SHIFT_TO_NORMAL_MAP
+from rd_client.parser.error import (
+        KeySequenceSizeExceededError, NonReadableCharacterError,
+        ShiftToggleWithNormalKeyError, SpecialSequenceShiftToggleError,
+        UndefinedSpecialKeyNameError, UnknownModifierError
+)
+from rd_client.parser.mappings import (
+        MODIFIER_INDEX_MAP, NORMAL_TO_KEY_MAP,
+        SHIFT_TO_NORMAL_MAP, KEY_TO_VALUE_MAP
+)
 from rd_client.parser.key_seqv import KeySeqv, Modifier, Key
 from rd_client.parser.key_seqv_parser import KeySeqvParser
 
@@ -360,7 +367,6 @@ def test_last_and_clear(ksp: KeySeqvParser):
 
 
 def test_file(ksp: KeySeqvParser):
-    # TODO: path
     dir_path = os.path.dirname(os.path.realpath(__file__))
     with open(f'{dir_path}/resources/open_fit_vutbr.txt', 'r') as f:
         for i, line in enumerate(f):
@@ -380,3 +386,18 @@ def test_file(ksp: KeySeqvParser):
     assert len(ks_pressed[3].keys) == 6 # 'fit.vu'
     assert len(ks_pressed[4].keys) == 6 # 'tbr.cz'
     assert len(ks_pressed[5].keys) == 1 and Key.KEY_ENTER in ks_pressed[5].keys
+
+
+def test_to_bytes(ksp: KeySeqvParser):
+    def _expected_bytes() -> bytes:
+        _b = b''
+        _b += (500).to_bytes(4, 'little')
+        _b += (1 << MODIFIER_INDEX_MAP.index(Modifier.LALT)).to_bytes(1, 'little')
+        _b += (0).to_bytes(1, 'little')
+        _b += (KEY_TO_VALUE_MAP[Key.KEY_ENTER]).to_bytes(1, 'little')
+        _b += (0).to_bytes(6, 'little')
+        return _b
+    ksp.parse_line(r'<500-a-\enter>', 0)
+
+    ks_pressed = [ks for ks in ksp.lof_keyseqvs if ks.keys]
+    assert ks_pressed[0].to_bytes() == bytearray(_expected_bytes())

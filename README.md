@@ -9,13 +9,19 @@ Year: 2022/2023
 ## Project tree
 ```
 RubberDucky_BachelorThesis
-.
 ├── CMakeLists.txt
 ├── Makefile
 ├── pico-sdk
 │   └── ...
 ├── pyproject.toml
 ├── rd_client
+│   ├── app_modes
+│   │   ├── base.py
+│   │   ├── cli_mode.py
+│   │   ├── __init__.py
+│   │   ├── network_mode.py
+│   │   ├── tui_mode.py
+│   │   └── utils.py
 │   ├── __init__.py
 │   ├── __main__.py
 │   └── parser
