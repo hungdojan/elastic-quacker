@@ -11,19 +11,33 @@
  */
 
 #include "key_seqv.h"
+#include "usb_general.h"    // enable_key_seqv
+
+#define COPY_KEY_SEQV(dst, src) \
+    do { \
+        dst.delay = src.delay;                      \
+        dst.report.modifier = src.report.modifier;  \
+        for (int i = 0; i < 6; i++)                \
+            dst.report.keycode[i] = src.report.keycode[i];  \
+        dst.last_item = src.last_item;              \
+    } while(0)
 
 /** Index of the key sequence to send */
 static size_t key_seqv_index = 0;
-/** Differentiates whether device runs hard-coded or uploaded script */
-// TODO: static bool mode_static = true;
+/** Differentiates whether device is currently being edited or not. */
+static bool read_write = false;
 /** Returns number of key sequences in the buffer */
-// TODO: static int key_seqv_len = -1;
+static int key_seqv_len = -1;
 
 void key_seqv_reset_index_counter() {
     key_seqv_index = 0;
 }
 
 void key_seqv_increase_counter() {
+    // empty list
+    if (key_seqv_len == 0)
+        return;
+
     if (!key_seqvs[key_seqv_index].last_item)
         key_seqv_index++;
 }
@@ -31,9 +45,71 @@ void key_seqv_increase_counter() {
 bool key_seqv_get_report(struct key_seqv_t * const report_out) {
     if (report_out == NULL)
         return false;
+    if (key_seqv_len == 0)
+        return false;
 
     *report_out = key_seqvs[key_seqv_index];
     return true;
+}
+
+void key_seqv_set_mode(bool is_read_write) {
+    read_write = is_read_write;
+    enable_key_seqv = !is_read_write;
+
+    // clear the list when used for the first time
+    if (key_seqv_len < 0 && is_read_write) {
+        key_seqv_clear();
+    }
+}
+
+bool key_seqv_push_report(const struct key_seqv_t *report_in) {
+    if (!read_write ||          // not in read-write mode
+        report_in == NULL ||    // wrong input conditions
+        key_seqv_len >= KEY_SEQV_BUFFER_SIZE    // list is full
+        ) {
+        return false;
+    }
+
+    // add new item
+    COPY_KEY_SEQV(key_seqvs[key_seqv_len], (*report_in));
+
+    // update last item flags
+    key_seqvs[key_seqv_len].last_item = true;
+    if (key_seqv_len > 0) {
+        key_seqvs[key_seqv_len - 1].last_item = false;
+    }
+    key_seqv_len++;
+
+    return true;
+}
+
+bool key_seqv_pop_report(struct key_seqv_t * const report_out) {
+    if (!read_write ||          // not in read-write mode
+        key_seqv_len < 1        // empty list
+        ) {
+        return false;
+    }
+
+    key_seqv_len--;
+
+    // update last item
+    if (key_seqv_len > 0) {
+        key_seqvs[key_seqv_len - 1].last_item = true;
+    }
+    // popped remove item
+    if (report_out) {
+        COPY_KEY_SEQV((*report_out), key_seqvs[key_seqv_len]);
+    }
+
+    return true;
+}
+
+void key_seqv_clear() {
+    key_seqv_len = 0;
+}
+
+int key_seqv_get_len() {
+    return key_seqv_len;
 }
 
 /* key_seqv.c */

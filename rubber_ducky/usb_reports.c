@@ -16,6 +16,8 @@
 #include "usb_general.h"
 #include "error_state.h"
 
+#define DEBUG_CAPS_LOCK
+
 bool enable_key_seqv = false;
 
 // report description for keyboard
@@ -73,39 +75,10 @@ uint16_t tud_hid_get_report_cb(uint8_t instance, uint8_t report_id,
         hid_report_type_t report_type, uint8_t* buffer, uint16_t reqlen) {
     (void) instance;
     (void) report_id;
-#if 0
-    // initial check
-    if (buffer == NULL || reqlen <= 0)
-        return 0;
-
-    // expected only report type INPUT
-    if (report_type != HID_REPORT_TYPE_INPUT)
-        return 0;
-
-    struct key_seqv_t key_sqv;
-    // no other key sequence is needed to be sent
-    if (!enable_key_seqv || !key_seqv_get_report(&key_sqv))
-        return 0;
-
-    // signalize error state; stop ongoing process
-    if (reqlen < 8) {
-        enter_error_state(ERR_GET_REPORT_SIZE);
-    }
-    uint16_t report_size = 8;
-
-    // send a report; turn on board's LED when last item is sent
-    sleep_ms(key_sqv.delay);
-    memcpy(buffer, &(key_sqv.report), report_size);
-    if (!key_sqv.last_item)
-        key_seqv_increase_counter();
-
-    return report_size;
-#else
     (void) report_type;
     (void) buffer;
     (void) reqlen;
     return 0;
-#endif
 }
 
 void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id,
@@ -116,6 +89,7 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id,
     (void) report_type;
     (void) buffer;
     (void) bufsize;
+#ifdef DEBUG_CAPS_LOCK
     if (buffer == NULL || bufsize <= 0)
         return;
     if (report_type != HID_REPORT_TYPE_OUTPUT)
@@ -125,6 +99,7 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id,
     if (!(buffer[0] & KEYBOARD_LED_CAPSLOCK)) {
         key_seqv_reset_index_counter();
     }
+#endif
 }
 
 void tud_hid_report_complete_cb(uint8_t instance, uint8_t const *report, uint8_t len) {
