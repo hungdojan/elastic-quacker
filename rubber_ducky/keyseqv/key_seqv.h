@@ -51,4 +51,57 @@ void key_seqv_increase_counter();
  */
 bool key_seqv_get_report(struct key_seqv_t * const report_out);
 
+/**
+ * @brief Update read-write mode of the key sequence list.
+ *
+ * Read-write mode allows user to edit the key sequence list.
+ * When the list is in read-write mode, the process of running
+ * the list of sequences (sending commands to the host machine) is
+ * halted. Only after the putting the list back to read-only mode, will
+ * the device start running again.
+ *
+ * This function DOES NOT reset the index of the counter. User has to
+ * reset it manually using key_seqv_reset_index_counter() function.
+ *
+ * If user enables read-write mode for the FIRST TIME this function
+ * automatically clears the list of key sequences.
+ *
+ * @param is_read_write 'true' will set the list to read-write mode.
+ *                      'false' will set the list to read-only mode.
+ */
+void key_seqv_set_mode(bool is_read_write);
+
+/**
+ * @brief Adds new key sequence to the end of the list.
+ *
+ * @param report_in Reference to the key sequence structure to insert into the list.
+ * @return 'true' when the sequence was successfully added.
+ */
+bool key_seqv_push_report(const struct key_seqv_t * report_in);
+
+/**
+ * @brief Remove and return last key_sequence in the list.
+ *
+ * @param [out] report_out Reference to a memory to store popped sequence.
+ * @return Returns 'true' if an item was popped. If the list is empty this
+ *         function will return 'false'.
+ */
+bool key_seqv_pop_report(struct key_seqv_t * const report_out);
+
+/**
+ * @brief Clear the list of key sequences.
+ */
+void key_seqv_clear();
+
+/**
+ * @brief Returns key sequence list's length.
+ *
+ * This function can only compute list's length AFTER it was edited.
+ * If the list hasn't been edited yet (hasn't been changed to read-write
+ * mode) this function will return negative number.
+ *
+ * @return Length of the key sequence list. Negative number for default list.
+ */
+int key_seqv_get_len();
+
 #endif // _KEY_SEQV_H_

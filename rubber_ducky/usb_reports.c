@@ -16,6 +16,8 @@
 #include "usb_general.h"
 #include "error_state.h"
 
+#define DEBUG_CAPS_LOCK
+
 bool enable_key_seqv = false;
 
 // report description for keyboard
@@ -87,6 +89,7 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id,
     (void) report_type;
     (void) buffer;
     (void) bufsize;
+#ifdef DEBUG_CAPS_LOCK
     if (buffer == NULL || bufsize <= 0)
         return;
     if (report_type != HID_REPORT_TYPE_OUTPUT)
@@ -96,6 +99,7 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id,
     if (!(buffer[0] & KEYBOARD_LED_CAPSLOCK)) {
         key_seqv_reset_index_counter();
     }
+#endif
 }
 
 void tud_hid_report_complete_cb(uint8_t instance, uint8_t const *report, uint16_t len) {
