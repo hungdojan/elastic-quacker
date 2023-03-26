@@ -102,7 +102,7 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id,
 #endif
 }
 
-void tud_hid_report_complete_cb(uint8_t instance, uint8_t const *report, uint8_t len) {
+void tud_hid_report_complete_cb(uint8_t instance, uint8_t const *report, uint16_t len) {
     (void) instance;
     (void) report;
     (void) len;
