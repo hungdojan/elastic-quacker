@@ -96,7 +96,7 @@ tusb_desc_endpoint_t const desc_ep_hid = {
     .bDescriptorType    = TUSB_DESC_ENDPOINT,
     .bEndpointAddress   = 0x81, // IN | INTERRUPT
     .bmAttributes       = {.xfer=TUSB_XFER_INTERRUPT},
-    .wMaxPacketSize     = {.size=CFG_TUD_HID_EP_BUFSIZE},
+    .wMaxPacketSize     = CFG_TUD_HID_EP_BUFSIZE,
     .bInterval          = 5,
 };
 
@@ -120,7 +120,7 @@ tusb_desc_endpoint_t const desc_ep_msc_in = {
     .bDescriptorType    = TUSB_DESC_ENDPOINT,
     .bEndpointAddress   = 0x83, // IN | BULK
     .bmAttributes       = {.xfer=TUSB_XFER_BULK},
-    .wMaxPacketSize     = {.size=U16_TO_U8S_LE(CFG_TUD_MSC_EP_BUFSIZE)},
+    .wMaxPacketSize     = CFG_TUD_MSC_EP_BUFSIZE,
     .bInterval          = 0,
 };
 
@@ -130,7 +130,7 @@ tusb_desc_endpoint_t const desc_ep_msc_out = {
     .bDescriptorType    = TUSB_DESC_ENDPOINT,
     .bEndpointAddress   = 0x03, // OUT | BULK
     .bmAttributes       = {.xfer=TUSB_XFER_BULK},
-    .wMaxPacketSize     = {.size=U16_TO_U8S_LE(CFG_TUD_MSC_EP_BUFSIZE)},
+    .wMaxPacketSize     = CFG_TUD_MSC_EP_BUFSIZE,
     .bInterval          = 0,
 };
 
