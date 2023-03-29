@@ -43,11 +43,6 @@ class NetworkMode(BaseMode):
         # sending data to RubberDucky
         for i, ks in enumerate(ksp.lof_keyseqvs):
             # creating payload
-            # TODO: new payload format
-            # | op | len | data |
-            # msg = self.START_BYTE
-            # msg += bytes(ks.to_bytes())
-            # msg += self.END_BYTE
             msg = create_payload(OperationCodes.PUSH_DATA, bytes(ks.to_bytes()))
 
             client_socket.send(msg)
