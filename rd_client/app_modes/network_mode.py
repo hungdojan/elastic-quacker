@@ -4,6 +4,7 @@ import sys
 
 from .base import BaseMode
 from rd_client.parser import KeySeqvParser
+from rd_client.payload import create_payload, OperationCodes
 
 class NetworkMode(BaseMode):
     """Cli mode for sending RubberDucky script to RubberDucky device using
@@ -30,7 +31,7 @@ class NetworkMode(BaseMode):
         # opening socket
         client_socket = socket.socket()
         client_socket.connect((self._host, self._port))
-        self._log_msg(logging.INFO, "------ Start parsing script ------")
+        self._log_msg(logging.INFO, '------ Start parsing script ------')
 
         # reading file
         with self._in_f as f:
@@ -38,19 +39,22 @@ class NetworkMode(BaseMode):
                 ksp.parse_line(line, i)
         ksp.set_last()
 
-        self._log_msg(logging.INFO, "--------- Sending to host ---------")
+        self._log_msg(logging.INFO, '--------- Sending to host ---------')
         # sending data to RubberDucky
         for i, ks in enumerate(ksp.lof_keyseqvs):
             # creating payload
-            msg = self.START_BYTE
-            msg += bytes(ks.to_bytes())
-            msg += self.END_BYTE
+            msg = create_payload(OperationCodes.PUSH_DATA, bytes(ks.to_bytes()))
 
             client_socket.send(msg)
-            # FIXME: log sent data
-            self._log_msg(logging.INFO, f"Sent: {i+1}. sequence")
+            self._log_msg(logging.INFO, f'Sent: {i+1}. sequence')
             recv_msg = client_socket.recv(200)
-            self._log_msg(logging.INFO, f"Recv: {recv_msg}")
+
+            # format the string
+            # display hex value of the byte
+            # add bigger delimiter after 8th byte
+            format_str = ' '.join([f'{val:02x}{" " if (i+1) % 8 == 0 else ""}'
+                                   for i, val in enumerate(recv_msg)])
+            self._log_msg(logging.INFO, f'Recv: {format_str}')
 
         client_socket.close()
-        self._log_msg(logging.INFO, "----- Paylod successfully sent -----")
+        self._log_msg(logging.INFO, '----- Paylod successfully sent -----')
