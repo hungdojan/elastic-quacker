@@ -35,13 +35,17 @@ extern struct key_seqv_t key_seqvs[KEY_SEQV_BUFFER_SIZE];
 
 /**
  * @brief Reset key sequence index counter.
+ *
+ * @param debug Reset debug index.
  */
-void key_seqv_reset_index_counter();
+void key_seqv_reset_index_counter(bool debug);
 
 /**
  * @brief Increase key sequence index counter.
+ *
+ * @param debug Increase the debug index.
  */
-void key_seqv_increase_counter();
+void key_seqv_increase_counter(bool debug);
 
 /**
  * @brief Returns next key combination.
@@ -50,6 +54,15 @@ void key_seqv_increase_counter();
  * @return Returns true if information passed through referenced memory is valid.
  */
 bool key_seqv_get_report(struct key_seqv_t * const report_out);
+
+/**
+ * @brief Returns debug info of the current key sequence.
+ *
+ * @param [out] buffer @todo:
+ * @param buffer_size  @todo:
+ * @return Size of the buffer content.
+ */
+size_t key_seqv_debug_report(uint8_t *buffer, size_t buffer_size);
 
 /**
  * @brief Update read-write mode of the key sequence list.

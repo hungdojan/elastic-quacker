@@ -24,22 +24,31 @@
 
 /** Index of the key sequence to send */
 static size_t key_seqv_index = 0;
+/** Index of the key sequence for debugging */
+static size_t key_seqv_index_debug = 0;
 /** Differentiates whether device is currently being edited or not. */
 static bool read_write = false;
 /** Returns number of key sequences in the buffer */
 static int key_seqv_len = -1;
 
-void key_seqv_reset_index_counter() {
-    key_seqv_index = 0;
+void key_seqv_reset_index_counter(bool debug) {
+    if (debug)
+        key_seqv_index_debug = 0;
+    else
+        key_seqv_index = 0;
 }
 
-void key_seqv_increase_counter() {
+void key_seqv_increase_counter(bool debug) {
     // empty list
     if (key_seqv_len == 0)
         return;
 
-    if (!key_seqvs[key_seqv_index].last_item)
-        key_seqv_index++;
+    if (!key_seqvs[key_seqv_index].last_item) {
+        if (debug)
+            key_seqv_index_debug++;
+        else
+            key_seqv_index++;
+    }
 }
 
 bool key_seqv_get_report(struct key_seqv_t * const report_out) {
@@ -50,6 +59,19 @@ bool key_seqv_get_report(struct key_seqv_t * const report_out) {
 
     *report_out = key_seqvs[key_seqv_index];
     return true;
+}
+
+size_t key_seqv_debug_report(uint8_t *buffer, size_t buffer_size) {
+    if (buffer == NULL)
+        return 0;
+
+    if (sizeof(struct key_seqv_t) > buffer_size)
+        return 0;
+
+    struct key_seqv_t *curr = &key_seqvs[key_seqv_index_debug];
+    memcpy(buffer, (const void *)curr, sizeof(struct key_seqv_t));
+
+    return sizeof(struct key_seqv_t);
 }
 
 void key_seqv_set_mode(bool is_read_write) {

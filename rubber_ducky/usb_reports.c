@@ -97,7 +97,7 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id,
 
     // reset key sequence when caps lock is turned off
     if (!(buffer[0] & KEYBOARD_LED_CAPSLOCK)) {
-        key_seqv_reset_index_counter();
+        key_seqv_reset_index_counter(false);
     }
 #endif
 }
@@ -110,13 +110,13 @@ void tud_hid_report_complete_cb(uint8_t instance, uint8_t const *report, uint16_
 
 void tud_mount_cb(void) {
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
-    key_seqv_reset_index_counter();
+    key_seqv_reset_index_counter(false);
     enable_key_seqv = true;
     is_ejected = false;
 }
 
 void tud_resume_cb(void) {
-    key_seqv_reset_index_counter();
+    key_seqv_reset_index_counter(false);
     enable_key_seqv = true;
     is_ejected = false;
 }
