@@ -36,7 +36,7 @@ uint32_t send_report() {
     // TODO: function `tud_hid_n_report` might enable custom reports
     // increase counter when report was successfully sent
     if (tud_hid_keyboard_report(0, key_sqv.report.modifier, keycode)) {
-        key_seqv_increase_counter();
+        key_seqv_increase_counter(false);
         return key_sqv.delay;
     }
     return 0;
