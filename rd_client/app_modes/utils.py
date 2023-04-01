@@ -52,7 +52,7 @@ def __process_args() -> dict[str, Any]:
     # check received arguments
     if args.input is not None:
         if not os.path.exists(args.input):
-            sys.stderr.write(f'File {args.input[0]} does not exists\n')
+            sys.stderr.write(f'File "{args.input}" does not exists\n')
             sys.exit(ErrorCode.INPUT_FILE_NOT_FOUND)
 
     # init logging
