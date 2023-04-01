@@ -14,6 +14,11 @@
 #include "pico/cyw43_arch.h"    // cyw43_arch_init
 #include "tusb.h"
 #include "usb_general.h"        // enable_key_seqv
+#include "tcp_server.h"         // init_server
+#include "dhcpserver/dhcpserver.h"
+
+#define WIFI_SSID "picow_test"
+#define WIFI_PSWD "password"
 
 /**
  * @brief Send a key sequence using HID report.
@@ -45,9 +50,26 @@ uint32_t send_report() {
 int main(void) {
     // init board and library
     board_init();
-    tusb_init();
     if (cyw43_arch_init())
         return 1;
+    struct server_data_t *sd = (struct server_data_t *)calloc(1, sizeof(struct server_data_t));
+    if (sd == NULL)
+        return 1;
+
+    // enable access point
+    cyw43_arch_enable_ap_mode(WIFI_SSID, WIFI_PSWD, CYW43_AUTH_WPA2_AES_PSK);
+
+    // define network's IP range
+    struct network_data_t nd;
+    IP4_ADDR(ip_2_ip4(&(nd.gateway)), 192, 168, 4, 1);
+    IP4_ADDR(ip_2_ip4(&(nd.mask)), 255, 255, 255, 252);
+
+    dhcp_server_t dhcp_server;
+    dhcp_server_init(&dhcp_server, &(nd.gateway), &(nd.mask));
+
+    init_server(sd, 5000);
+
+    tusb_init();
 
     // initial booting delay
     for (int i = 0; i < 1500000; i++)
@@ -61,6 +83,9 @@ int main(void) {
         sleep_ms(delay);
     }
 
+    close_server(sd);
+    dhcp_server_deinit(&dhcp_server);
+    cyw43_arch_deinit();
     return 0;
 }
 
