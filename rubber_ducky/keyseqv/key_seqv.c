@@ -100,6 +100,7 @@ bool key_seqv_push_report(const struct key_seqv_t *report_in) {
     }
 
     // add new item
+    // FIXME: probably segfault happening here
     COPY_KEY_SEQV(key_seqvs[key_seqv_len], (*report_in));
 
     // update last item flags

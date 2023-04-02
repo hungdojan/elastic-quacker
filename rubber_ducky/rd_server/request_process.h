@@ -1,7 +1,6 @@
 #ifndef _REQUEST_PROCESS_H_
 #define _REQUEST_PROCESS_H_
 
-#include "lwip/err.h"
 #include "keyseqv/key_seqv.h"
 
 #define _RESPONSE_HEADER(op_code, buffer, buffer_size) \
@@ -18,7 +17,8 @@
 
 struct packet_t {
     uint8_t op_code;
-    uint32_t payload_len;
+    uint8_t reserved;
+    uint16_t payload_len;
     uint8_t payload[];
 };
 
@@ -29,9 +29,9 @@ enum oper_codes {
     OP_CLEAR_DATA,
     OP_PUSH_DATA,
     OP_POP_DATA,
-    OP_GET_LINE,
-    OP_INC_LINE,
-    OP_RESET_LINE_INDEX,
+    OP_GET_DEBUG_LINE,
+    OP_INC_DEBUG_LINE,
+    OP_RESET_DEBUG_LINE_INDEX,
 
     // outgoing
     OP_IN_OK,
@@ -43,32 +43,36 @@ enum oper_codes {
  *
  * @param buffer      Received buffer with data.
  * @param buffer_size Buffer's max size.
+ * @return Number of bytes written.
  */
-err_t set_editable_pl(uint8_t *buffer, size_t buffer_size);
+size_t set_editable_pl(uint8_t *buffer, size_t buffer_size);
 
 /**
  * @brief Process "GET EDITABLE" packet.
  *
  * @param buffer      Received buffer with data.
  * @param buffer_size Buffer's max size.
+ * @return Number of bytes written.
  */
-err_t get_editable_pl(uint8_t *buffer, size_t buffer_size);
+size_t get_editable_pl(uint8_t *buffer, size_t buffer_size);
 
 /**
  * @brief Process "CLEAR DATA" packet.
  *
  * @param buffer      Received buffer with data.
  * @param buffer_size Buffer's max size.
+ * @return Number of bytes written.
  */
-err_t clear_data_pl(uint8_t *buffer, size_t buffer_size);
+size_t clear_data_pl(uint8_t *buffer, size_t buffer_size);
 
 /**
  * @brief Process "PUSH DATA" packet.
  *
  * @param buffer      Received buffer with data.
  * @param buffer_size Buffer's max size.
+ * @return Number of bytes written.
  */
-err_t push_data_pl(uint8_t *buffer, size_t buffer_size);
+size_t push_data_pl(uint8_t *buffer, size_t buffer_size);
 
 /**
  * @brief Process "POP DATA" packet.
@@ -76,30 +80,51 @@ err_t push_data_pl(uint8_t *buffer, size_t buffer_size);
  * @param buffer      Received buffer with data.
  * @param buffer_size Buffer's max size.
  */
-err_t pop_data_pl(uint8_t *buffer, size_t buffer_size);
+size_t pop_data_pl(uint8_t *buffer, size_t buffer_size);
 
 /**
- * @brief Process "GET LINE" packet.
+ * @brief Process "GET DEBUG LINE" packet.
  *
  * @param buffer      Received buffer with data.
  * @param buffer_size Buffer's max size.
+ * @return Number of bytes written.
  */
-err_t get_line_pl(uint8_t *buffer, size_t buffer_size);
+size_t get_debug_line_pl(uint8_t *buffer, size_t buffer_size);
 
 /**
- * @brief Process "INC LINE" packet.
+ * @brief Process "INC DEBUG LINE" packet.
  *
  * @param buffer      Received buffer with data.
  * @param buffer_size Buffer's max size.
+ * @return Number of bytes written.
  */
-err_t inc_line_pl(uint8_t *buffer, size_t buffer_size);
+size_t inc_debug_line_pl(uint8_t *buffer, size_t buffer_size);
 
 /**
- * @brief Process "RESET LINE INDEX" packet.
+ * @brief Process "RESET DEBUG LINE INDEX" packet.
  *
  * @param buffer      Received buffer with data.
  * @param buffer_size Buffer's max size.
+ * @return Number of bytes written.
  */
-err_t reset_line_index_pl(uint8_t *buffer, size_t buffer_size);
+size_t reset_debug_line_index_pl(uint8_t *buffer, size_t buffer_size);
+
+/**
+ * @brief Generate response to a packet with unknown operation code.
+ *
+ * @param buffer      Received buffer with data.
+ * @param buffer_size Buffer's max size.
+ * @return Number of bytes written.
+*/
+size_t unknown_opcode_pl(uint8_t *buffer, size_t buffer_size);
+
+/**
+ * @brief Generate response to a packet with payload size exceeding buffer size.
+ *
+ * @param buffer      Received buffer with data.
+ * @param buffer_size Buffer's max size.
+ * @return Number of bytes written.
+*/
+size_t too_big_pl(uint8_t *buffer, size_t buffer_size);
 
 #endif // _REQUEST_PROCESS_H_
