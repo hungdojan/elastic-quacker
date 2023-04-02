@@ -49,7 +49,7 @@ def create_payload(op_code: OperationCodes, data: bytes|None=None) -> bytearray:
     elif op_code == OperationCodes.PUSH_DATA:
         if not data:
             raise PayloadFormatError()
-        _ba.append(len(data))
+        _ba.extend(len(data).to_bytes(4, 'little'))
         _ba.extend(data)
 
     elif (
