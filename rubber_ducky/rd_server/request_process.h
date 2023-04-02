@@ -32,6 +32,7 @@ enum oper_codes {
     OP_GET_DEBUG_LINE,
     OP_INC_DEBUG_LINE,
     OP_RESET_DEBUG_LINE_INDEX,
+    OP_RUN_SEQUENCES,
 
     // outgoing
     OP_IN_OK,
@@ -108,6 +109,15 @@ size_t inc_debug_line_pl(uint8_t *buffer, size_t buffer_size);
  * @return Number of bytes written.
  */
 size_t reset_debug_line_index_pl(uint8_t *buffer, size_t buffer_size);
+
+/**
+ * @brief Process "RUN SEQUENCES" packet.
+ *
+ * @param buffer      Received buffer with data.
+ * @param buffer_size Buffer's max size.
+ * @return Number of bytes written.
+ */
+size_t run_sequences(uint8_t *buffer, size_t buffer_size);
 
 /**
  * @brief Generate response to a packet with unknown operation code.

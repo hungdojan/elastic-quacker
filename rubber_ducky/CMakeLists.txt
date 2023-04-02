@@ -5,7 +5,7 @@ add_executable(rubber_ducky
 target_sources(rubber_ducky PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/usb_descriptors.c
     ${CMAKE_CURRENT_SOURCE_DIR}/usb_reports.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/error_state.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/usb_general.c
     ${CMAKE_CURRENT_SOURCE_DIR}/keyseqv/key_seqv.c
     ${CMAKE_CURRENT_SOURCE_DIR}/msc.c
     ${CMAKE_CURRENT_SOURCE_DIR}/rd_server/dhcpserver/dhcpserver.c

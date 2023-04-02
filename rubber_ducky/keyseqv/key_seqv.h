@@ -125,4 +125,9 @@ void key_seqv_clear();
  */
 int key_seqv_get_len();
 
+/**
+ * @brief Perform the stored key sequences.
+ */
+void key_seqv_run_sequences();
+
 #endif // _KEY_SEQV_H_

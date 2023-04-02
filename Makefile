@@ -31,7 +31,7 @@ run_cli:
 	poetry run app -v
 
 run_client:
-	poetry run app -vn -p 5001 -H 127.0.0.1
+	poetry run app -vn -p 5000 -H 192.168.4.1
 
 test:
 	poetry run coverage run -m pytest -vv && poetry run coverage report -m

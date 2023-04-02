@@ -11,7 +11,7 @@
  */
 
 #include "key_seqv.h"
-#include "usb_general.h"    // enable_key_seqv
+#include "usb_general.h"    // set_enable_key_seqv, active_delay
 
 #define COPY_KEY_SEQV(dst, src) \
     do { \
@@ -32,10 +32,12 @@ static bool read_write = false;
 static int key_seqv_len = -1;
 
 void key_seqv_reset_index_counter(bool debug) {
-    if (debug)
+    if (debug) {
         key_seqv_index_debug = 0;
-    else
+    } else {
         key_seqv_index = 0;
+        active_delay(100000);
+    }
 }
 
 void key_seqv_increase_counter(bool debug) {
@@ -79,11 +81,14 @@ void key_seqv_set_mode(bool is_read_write) {
         return;
 
     read_write = is_read_write;
-    enable_key_seqv = !is_read_write;
+    set_enable_key_seqv(!is_read_write);
 
     // clear the list when used for the first time
     if (key_seqv_len < 0 && is_read_write) {
         key_seqv_clear();
+    }
+    if (!is_read_write) {
+        key_seqv_reset_index_counter(false);
     }
 }
 
@@ -100,7 +105,6 @@ bool key_seqv_push_report(const struct key_seqv_t *report_in) {
     }
 
     // add new item
-    // FIXME: probably segfault happening here
     COPY_KEY_SEQV(key_seqvs[key_seqv_len], (*report_in));
 
     // update last item flags
@@ -140,6 +144,10 @@ void key_seqv_clear() {
 
 int key_seqv_get_len() {
     return key_seqv_len;
+}
+
+void key_seqv_run_sequences() {
+    key_seqv_reset_index_counter(false);
 }
 
 /* key_seqv.c */

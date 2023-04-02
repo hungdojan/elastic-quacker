@@ -14,11 +14,8 @@
 #include "keyseqv/key_seqv.h"
 #include "pico/cyw43_arch.h"
 #include "usb_general.h"
-#include "error_state.h"
 
 #define DEBUG_CAPS_LOCK
-
-bool enable_key_seqv = false;
 
 // report description for keyboard
 uint8_t const hid_report[] = {
@@ -109,15 +106,14 @@ void tud_hid_report_complete_cb(uint8_t instance, uint8_t const *report, uint16_
 }
 
 void tud_mount_cb(void) {
-    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
     key_seqv_reset_index_counter(false);
-    enable_key_seqv = true;
+    set_enable_key_seqv(true);
     is_ejected = false;
 }
 
 void tud_resume_cb(void) {
     key_seqv_reset_index_counter(false);
-    enable_key_seqv = true;
+    set_enable_key_seqv(true);
     is_ejected = false;
 }
 

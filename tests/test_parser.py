@@ -368,7 +368,7 @@ def test_last_and_clear(ksp: KeySeqvParser):
 
 def test_file(ksp: KeySeqvParser):
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(f'{dir_path}/resources/open_fit_vutbr.txt', 'r') as f:
+    with open(f'{dir_path}/resources/open_fit_vut.txt', 'r') as f:
         for i, line in enumerate(f):
             ksp.parse_line(line, i)
     ksp.set_last()
@@ -384,7 +384,7 @@ def test_file(ksp: KeySeqvParser):
     assert len(ks_pressed[1].keys) == 4 # 'fire'
     assert len(ks_pressed[2].keys) == 4 # 'fox '
     assert len(ks_pressed[3].keys) == 6 # 'fit.vu'
-    assert len(ks_pressed[4].keys) == 6 # 'tbr.cz'
+    assert len(ks_pressed[4].keys) == 4 # 't.cz'
     assert len(ks_pressed[5].keys) == 1 and Key.KEY_ENTER in ks_pressed[5].keys
 
 
