@@ -31,30 +31,55 @@ class NetworkMode(BaseMode):
         # opening socket
         client_socket = socket.socket()
         client_socket.connect((self._host, self._port))
-        self._log_msg(logging.INFO, '------ Start parsing script ------')
+        if 0:
+            self._log_msg(logging.INFO, '------ Start parsing script ------')
 
-        # reading file
-        with self._in_f as f:
-            for i, line in enumerate(f):
-                ksp.parse_line(line, i)
-        ksp.set_last()
+            # reading file
+            with self._in_f as f:
+                for i, line in enumerate(f):
+                    ksp.parse_line(line, i)
+            ksp.set_last()
 
-        self._log_msg(logging.INFO, '--------- Sending to host ---------')
-        # sending data to RubberDucky
-        for i, ks in enumerate(ksp.lof_keyseqvs):
-            # creating payload
-            msg = create_payload(OperationCodes.PUSH_DATA, bytes(ks.to_bytes()))
+            self._log_msg(logging.INFO, '--------- Sending to host ---------')
+            # sending data to RubberDucky
+            for i, ks in enumerate(ksp.lof_keyseqvs):
+                # creating payload
+                msg = create_payload(OperationCodes.PUSH_DATA, bytes(ks.to_bytes()))
 
-            client_socket.send(msg)
-            self._log_msg(logging.INFO, f'Sent: {i+1}. sequence')
-            recv_msg = client_socket.recv(200)
+                client_socket.send(msg)
+                self._log_msg(logging.INFO, f'Sent: {i+1}. sequence')
+                recv_msg = client_socket.recv(200)
 
-            # format the string
-            # display hex value of the byte
-            # add bigger delimiter after 8th byte
-            format_str = ' '.join([f'{val:02x}{" " if (i+1) % 8 == 0 else ""}'
-                                   for i, val in enumerate(recv_msg)])
-            self._log_msg(logging.INFO, f'Recv: {format_str}')
-
+                # format the string
+                # display hex value of the byte
+                # add bigger delimiter after 8th byte
+                format_str = ' '.join([f'{val:02x}{" " if (i+1) % 8 == 0 else ""}'
+                                       for i, val in enumerate(recv_msg)])
+                self._log_msg(logging.INFO, f'Recv: {format_str}')
+        else:
+             client_socket.send(create_payload(OperationCodes.SET_EDITABLE, bytes(1)))
+             recv_msg = client_socket.recv(200)
+             self._log_msg(logging.INFO, f'Recv: {recv_msg}')
+             client_socket.send(create_payload(OperationCodes.GET_EDITABLE))
+             recv_msg = client_socket.recv(200)
+             self._log_msg(logging.INFO, f'Recv: {recv_msg}')
+             client_socket.send(create_payload(OperationCodes.CLEAR_DATA))
+             recv_msg = client_socket.recv(200)
+             self._log_msg(logging.INFO, f'Recv: {recv_msg}')
+             client_socket.send(create_payload(OperationCodes.PUSH_DATA, bytes(1)))
+             recv_msg = client_socket.recv(200)
+             self._log_msg(logging.INFO, f'Recv: {recv_msg}')
+             client_socket.send(create_payload(OperationCodes.POP_DATA))
+             recv_msg = client_socket.recv(200)
+             self._log_msg(logging.INFO, f'Recv: {recv_msg}')
+             client_socket.send(create_payload(OperationCodes.GET_LINE))
+             recv_msg = client_socket.recv(200)
+             self._log_msg(logging.INFO, f'Recv: {recv_msg}')
+             client_socket.send(create_payload(OperationCodes.INC_LINE))
+             recv_msg = client_socket.recv(200)
+             self._log_msg(logging.INFO, f'Recv: {recv_msg}')
+             client_socket.send(create_payload(OperationCodes.RESET_LINE_INDEX))
+             recv_msg = client_socket.recv(200)
+             self._log_msg(logging.INFO, f'Recv: {recv_msg}')
         client_socket.close()
         self._log_msg(logging.INFO, '----- Paylod successfully sent -----')

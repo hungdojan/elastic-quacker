@@ -75,6 +75,9 @@ size_t key_seqv_debug_report(uint8_t *buffer, size_t buffer_size) {
 }
 
 void key_seqv_set_mode(bool is_read_write) {
+    if (is_read_write == read_write)
+        return;
+
     read_write = is_read_write;
     enable_key_seqv = !is_read_write;
 
@@ -82,6 +85,10 @@ void key_seqv_set_mode(bool is_read_write) {
     if (key_seqv_len < 0 && is_read_write) {
         key_seqv_clear();
     }
+}
+
+bool key_seqv_is_read_write() {
+    return read_write;
 }
 
 bool key_seqv_push_report(const struct key_seqv_t *report_in) {

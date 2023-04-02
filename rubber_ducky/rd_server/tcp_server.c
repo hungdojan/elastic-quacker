@@ -1,4 +1,5 @@
 #include "tcp_server.h"
+#include "request_process.h"
 
 /**
  * @brief Clean up function for lost/ended connections.
@@ -39,12 +40,46 @@ static err_t recv_cb(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
         return close_connection(arg, tpcb);
     }
 
+    bool tmp = true;
     pbuf_copy_partial(p, cd->buffer, MIN(CLIENT_BUFFER_SIZE, p->tot_len), 0);
-    // TODO: fix later
-    tcp_write(tpcb, cd->buffer, p->tot_len, 0);
+    struct packet_t *packet = (struct packet_t *)cd->buffer;
+    switch (packet->op_code) {
+        case OP_SET_EDITABLE:
+            err = set_editable_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+            break;
+        case OP_GET_EDITABLE:
+            err = get_editable_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+            break;
+        case OP_CLEAR_DATA:
+            err = clear_data_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+            break;
+        case OP_PUSH_DATA:
+            err = push_data_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+            break;
+        case OP_POP_DATA:
+            err = pop_data_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+            break;
+        case OP_GET_LINE:
+            err = get_line_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+            break;
+        case OP_INC_LINE:
+            err = inc_line_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+            break;
+        case OP_RESET_LINE_INDEX:
+            err = reset_line_index_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+            break;
+        default:
+            tmp = false;
+            break;
+    }
+
+    if (tmp)
+        tcp_write(tpcb, cd->buffer, packet->payload_len + sizeof(uint8_t) + sizeof(size_t), 0);
+    else
+        tcp_write(tpcb, cd->buffer, p->tot_len, 0);
     tcp_recved(tpcb, p->tot_len);
     pbuf_free(p);
-    return ERR_OK;
+    return err;
 
 }
 
