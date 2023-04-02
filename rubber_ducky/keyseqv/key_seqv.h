@@ -58,8 +58,8 @@ bool key_seqv_get_report(struct key_seqv_t * const report_out);
 /**
  * @brief Returns debug info of the current key sequence.
  *
- * @param [out] buffer @todo:
- * @param buffer_size  @todo:
+ * @param [out] buffer Outputing buffer where function stores current key sequence data.
+ * @param buffer_size  Buffer's max size.
  * @return Size of the buffer content.
  */
 size_t key_seqv_debug_report(uint8_t *buffer, size_t buffer_size);
@@ -83,6 +83,14 @@ size_t key_seqv_debug_report(uint8_t *buffer, size_t buffer_size);
  *                      'false' will set the list to read-only mode.
  */
 void key_seqv_set_mode(bool is_read_write);
+
+/**
+ * @brief Check if the device is in read-write mode.
+ *
+ * @return 'true' is returned if device is currently in read-write mode;
+ *         'false' otherwise.
+ */
+bool key_seqv_is_read_write();
 
 /**
  * @brief Adds new key sequence to the end of the list.
