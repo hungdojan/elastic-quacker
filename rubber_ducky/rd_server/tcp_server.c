@@ -40,43 +40,47 @@ static err_t recv_cb(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
         return close_connection(arg, tpcb);
     }
 
-    bool tmp = true;
     pbuf_copy_partial(p, cd->buffer, MIN(CLIENT_BUFFER_SIZE, p->tot_len), 0);
+    size_t packet_len = p->tot_len;
     struct packet_t *packet = (struct packet_t *)cd->buffer;
-    switch (packet->op_code) {
-        case OP_SET_EDITABLE:
-            err = set_editable_pl(cd->buffer, CLIENT_BUFFER_SIZE);
-            break;
-        case OP_GET_EDITABLE:
-            err = get_editable_pl(cd->buffer, CLIENT_BUFFER_SIZE);
-            break;
-        case OP_CLEAR_DATA:
-            err = clear_data_pl(cd->buffer, CLIENT_BUFFER_SIZE);
-            break;
-        case OP_PUSH_DATA:
-            err = push_data_pl(cd->buffer, CLIENT_BUFFER_SIZE);
-            break;
-        case OP_POP_DATA:
-            err = pop_data_pl(cd->buffer, CLIENT_BUFFER_SIZE);
-            break;
-        case OP_GET_LINE:
-            err = get_line_pl(cd->buffer, CLIENT_BUFFER_SIZE);
-            break;
-        case OP_INC_LINE:
-            err = inc_line_pl(cd->buffer, CLIENT_BUFFER_SIZE);
-            break;
-        case OP_RESET_LINE_INDEX:
-            err = reset_line_index_pl(cd->buffer, CLIENT_BUFFER_SIZE);
-            break;
-        default:
-            tmp = false;
-            break;
+
+    // packet too big
+    if (packet->payload_len > CLIENT_BUFFER_SIZE - sizeof(struct packet_t)) {
+        packet_len = too_big_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+    } else {
+        // check operation codes
+        switch (packet->op_code) {
+            case OP_SET_EDITABLE:
+                packet_len = set_editable_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+                break;
+            case OP_GET_EDITABLE:
+                packet_len = get_editable_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+                break;
+            case OP_CLEAR_DATA:
+                packet_len = clear_data_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+                break;
+            case OP_PUSH_DATA:
+                packet_len = push_data_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+                break;
+            case OP_POP_DATA:
+                packet_len = pop_data_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+                break;
+            case OP_GET_DEBUG_LINE:
+                packet_len = get_debug_line_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+                break;
+            case OP_INC_DEBUG_LINE:
+                packet_len = inc_debug_line_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+                break;
+            case OP_RESET_DEBUG_LINE_INDEX:
+                packet_len = reset_debug_line_index_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+                break;
+            default:
+                packet_len = unknown_opcode_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+                break;
+        }
     }
 
-    if (tmp)
-        tcp_write(tpcb, cd->buffer, packet->payload_len + sizeof(uint8_t) + sizeof(size_t), 0);
-    else
-        tcp_write(tpcb, cd->buffer, p->tot_len, 0);
+    tcp_write(tpcb, cd->buffer, packet_len, 0);
     tcp_recved(tpcb, p->tot_len);
     pbuf_free(p);
     return err;
