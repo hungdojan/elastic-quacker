@@ -13,7 +13,7 @@
 #include "keyseqv/key_seqv.h"   // struct key_seqv_t, key_seqv_get_report
 #include "pico/cyw43_arch.h"    // cyw43_arch_init
 #include "tusb.h"
-#include "usb_general.h"        // enable_key_seqv
+#include "usb_general.h"        // get_enable_key_seqv, active_delay
 #include "tcp_server.h"         // init_server
 #include "dhcpserver/dhcpserver.h"
 
@@ -30,7 +30,7 @@ uint32_t send_report() {
     if (!tud_hid_ready())
         return 0;
 
-    if (!enable_key_seqv || !key_seqv_get_report(&key_sqv)) {
+    if (!get_enable_key_seqv() || !key_seqv_get_report(&key_sqv)) {
         tud_hid_keyboard_report(0, 0, NULL);
         return 0;
     }
@@ -72,8 +72,7 @@ int main(void) {
     tusb_init();
 
     // initial booting delay
-    for (int i = 0; i < 1500000; i++)
-        tud_task(); // tinyusb device task
+    active_delay(1500000);
 
     // main program loop
     uint32_t delay = 0;

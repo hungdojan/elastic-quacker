@@ -24,19 +24,19 @@ RubberDucky_BachelorThesis
 │   │   └── utils.py
 │   ├── __init__.py
 │   ├── __main__.py
-│   └── parser
-│       ├── error.py
-│       ├── __init__.py
-│       ├── key_seqv_parser.py
-│       ├── key_seqv.py
-│       ├── mappings.py
-│       └── regex_groups.py
+│   ├── parser
+│   │   ├── error.py
+│   │   ├── __init__.py
+│   │   ├── key_seqv_parser.py
+│   │   ├── key_seqv.py
+│   │   ├── mappings.py
+│   │   └── regex_groups.py
+│   └── payload
+│       └── __init__.py
 ├── README.md
 ├── requirements.txt
 ├── rubber_ducky
 │   ├── CMakeLists.txt
-│   ├── error_state.c
-│   ├── error_state.h
 │   ├── keyseqv
 │   │   ├── key_seqv.c
 │   │   ├── key_seqv.h
@@ -44,12 +44,20 @@ RubberDucky_BachelorThesis
 │   │   └── key_seqv_win.c
 │   ├── main.c
 │   ├── msc.c
+│   ├── rd_server
+│   │   ├── dhcpserver
+│   │   ├── lwipopts.h
+│   │   ├── request_process.c
+│   │   ├── request_process.h
+│   │   ├── tcp_server.c
+│   │   └── tcp_server.h
 │   ├── tusb_config.h
 │   ├── usb_descriptors.c
+│   ├── usb_general.c
 │   ├── usb_general.h
 │   └── usb_reports.c
 └── tests
     ├── resources
-    │   └── open_fit_vutbr.txt
+    │   └── open_fit_vut.txt
     └── test_parser.py
 ```

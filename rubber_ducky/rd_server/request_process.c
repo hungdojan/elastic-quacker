@@ -43,7 +43,8 @@ static size_t create_response(enum oper_codes op_code, const void *msg, size_t m
 }
 
 size_t set_editable_pl(uint8_t *buffer, size_t buffer_size) {
-    bool value = buffer[2];
+    struct packet_t *packet = (struct packet_t *)buffer;
+    bool value = packet->payload[0];
     key_seqv_set_mode(value);
 
     return create_response(OP_IN_OK, NULL, 0, buffer, buffer_size);
@@ -63,7 +64,7 @@ size_t clear_data_pl(uint8_t *buffer, size_t buffer_size) {
 
 size_t push_data_pl(uint8_t *buffer, size_t buffer_size) {
     struct key_seqv_t *new_keyseqv = (struct key_seqv_t *)
-        (buffer + sizeof(uint8_t) + sizeof(uint32_t)); // offset by packet header
+        (buffer + sizeof(struct packet_t)); // offset by packet header
     bool res = key_seqv_push_report(new_keyseqv);
 
     // create a response
@@ -113,6 +114,13 @@ size_t inc_debug_line_pl(uint8_t *buffer, size_t buffer_size) {
 
 size_t reset_debug_line_index_pl(uint8_t *buffer, size_t buffer_size) {
     key_seqv_reset_index_counter(true);
+
+    // create a response
+    return create_response(OP_IN_OK, NULL, 0, buffer, buffer_size);
+}
+
+size_t run_sequences(uint8_t *buffer, size_t buffer_size) {
+    key_seqv_reset_index_counter(false);
 
     // create a response
     return create_response(OP_IN_OK, NULL, 0, buffer, buffer_size);

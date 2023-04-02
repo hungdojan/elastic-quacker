@@ -29,7 +29,26 @@
 
 // USB status used by MSC; indicates if the device was connected or not
 extern bool is_ejected;
-// enables rubber ducky scripting
-extern bool enable_key_seqv;
+
+/**
+ * @brief Return the state of 'enable_key_seqv' variable.
+ *
+ * @return State of 'enable_key_seqv'.
+ */
+bool get_enable_key_seqv();
+
+/**
+ * @brief Update the state of 'enable_key_seqv' variable.
+ *
+ * @param value New state of 'enable_key_seqv' variable.
+ */
+void set_enable_key_seqv(bool value);
+
+/**
+ * @brief Passive delay; call tud_task() in the mean time.
+ *
+ * @param ticks Number of ticks.
+ */
+void active_delay(uint32_t ticks);
 
 #endif // _USB_GENERAL_H_

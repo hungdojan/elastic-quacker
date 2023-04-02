@@ -10,8 +10,9 @@ class OperationCodes(enum.Enum):
     GET_DEBUG_LINE          = 6
     INC_DEBUG_LINE          = 7
     RESET_DEBUG_LINE_INDEX  = 8
-    RESPONSE_OK             = 9
-    RESPONSE_ERR            = 10
+    RUN_SEQUENCES           = 9
+    RESPONSE_OK             = 10
+    RESPONSE_ERR            = 11
 
 
 class PayloadFormatError(Exception):
@@ -64,7 +65,8 @@ def create_payload(op_code: OperationCodes, data: bytes|None=None) -> bytearray:
         op_code == OperationCodes.POP_DATA or
         op_code == OperationCodes.GET_DEBUG_LINE or
         op_code == OperationCodes.INC_DEBUG_LINE or
-        op_code == OperationCodes.RESET_DEBUG_LINE_INDEX
+        op_code == OperationCodes.RESET_DEBUG_LINE_INDEX or
+        op_code == OperationCodes.RUN_SEQUENCES
     ):
         # append payload_len and payload itself
         _ba.extend((0).to_bytes(2, 'little'))
