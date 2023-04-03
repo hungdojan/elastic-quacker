@@ -70,7 +70,7 @@ size_t push_data_pl(uint8_t *buffer, size_t buffer_size) {
     // create a response
     if (res)
         return create_response(OP_IN_OK, NULL, 0, buffer, buffer_size);
-    return create_response(OP_IN_OK,
+    return create_response(OP_IN_ERR,
                            PUSH_ERR_MSG,
                            strlen(PUSH_ERR_MSG) + 1,
                            buffer,
