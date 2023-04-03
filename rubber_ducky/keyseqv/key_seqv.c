@@ -87,9 +87,6 @@ void key_seqv_set_mode(bool is_read_write) {
     if (key_seqv_len < 0 && is_read_write) {
         key_seqv_clear();
     }
-    if (!is_read_write) {
-        key_seqv_reset_index_counter(false);
-    }
 }
 
 bool key_seqv_is_read_write() {

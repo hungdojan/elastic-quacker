@@ -79,6 +79,13 @@ class NetworkMode(BaseMode):
                 self._log_msg(logging.INFO, self.__format_recv_msg('Recv', recv_msg))
             return True
 
+        def _send_run_command(socket: socket.socket):
+            msg = create_payload(OperationCodes.RUN_SEQUENCES)
+            socket.send(msg)
+            self._log_msg(logging.INFO, self.__format_sent_msg('Sent', msg))
+            recv_msg = socket.recv(self.__SOCKET_BUFFER_SIZE)
+            self._log_msg(logging.INFO, self.__format_recv_msg('Recv', recv_msg))
+
         ksp = KeySeqvParser(self._verbose)
 
         self._log_msg(logging.INFO, '------ Start parsing script ------')
@@ -116,8 +123,9 @@ class NetworkMode(BaseMode):
             # add bigger delimiter after 8th byte
             self._log_msg(logging.INFO, self.__format_recv_msg('Recv', recv_msg))
 
-        # disable writing mode
+        # disable writing mode and run the sequences
         _enable_read_write_mode(client_socket, False)
+        _send_run_command(client_socket)
 
         client_socket.close()
         self._log_msg(logging.INFO, '----- Paylod successfully sent -----')

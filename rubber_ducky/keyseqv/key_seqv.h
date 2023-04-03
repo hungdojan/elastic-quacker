@@ -20,7 +20,7 @@
 
 #define LAST_ITEM {0, {0, 0, {0, }}, true}
 
-#define KEY_SEQV_BUFFER_SIZE 101
+#define KEY_SEQV_BUFFER_SIZE 501
 
 /**
  * @brief Key sequence structure.
