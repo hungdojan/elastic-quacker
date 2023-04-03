@@ -1,6 +1,8 @@
 import logging
 import sys
 
+from rd_client.parser.error import ParserError
+
 from .base import BaseMode
 from datetime import datetime
 from rd_client.parser import KeySeqvParser
@@ -46,15 +48,20 @@ class CliMode(BaseMode):
             self._out_f = sys.stdout
 
 
-    def run(self):
+    def run(self) -> int:
         ksp = KeySeqvParser(self._verbose)
 
         self._log_msg(logging.INFO, "------ Start parsing script ------")
-        # parse the file/from stdin
-        with self._in_f as f:
-            for i, line in enumerate(f):
-                ksp.parse_line(line, i)
-        ksp.set_last()
+        try:
+            # parse the file/from stdin
+            with self._in_f as f:
+                for i, line in enumerate(f):
+                    ksp.parse_line(line, i)
+            ksp.set_last()
+        except ParserError:
+            self._log_msg(logging.ERROR, 'Terminating application')
+            self._display_nonverbose_error_msg()
+            return 1
 
         self._log_msg(logging.INFO, "------- Writing to output -------")
         # write into output file/stdout
@@ -64,3 +71,4 @@ class CliMode(BaseMode):
                 f.write(str(ks))
             f.write(FOOTER_CONTENT)
         self._log_msg(logging.INFO, "-------- Writing finished --------")
+        return 0

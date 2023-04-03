@@ -2,6 +2,8 @@ import logging
 import socket
 import sys
 
+from rd_client.parser.error import ParserError
+
 from .base import BaseMode
 from rd_client.parser import KeySeqvParser
 from rd_client.payload import create_payload, OperationCodes
@@ -52,7 +54,7 @@ class NetworkMode(BaseMode):
         return f'{prefix_str:<23}[{data_str}]'
 
 
-    def run(self):
+    def run(self) -> int:
 
         def _enable_read_write_mode(socket: socket.socket, enable_read_write: int) -> bool:
             val = bytearray()
@@ -80,12 +82,17 @@ class NetworkMode(BaseMode):
         ksp = KeySeqvParser(self._verbose)
 
         self._log_msg(logging.INFO, '------ Start parsing script ------')
+        try:
+            # reading file
+            with self._in_f as f:
+                for i, line in enumerate(f):
+                    ksp.parse_line(line, i)
+            ksp.set_last()
+        except ParserError:
+            self._log_msg(logging.ERROR, 'Terminating application')
+            self._display_nonverbose_error_msg()
+            return 1
 
-        # reading file
-        with self._in_f as f:
-            for i, line in enumerate(f):
-                ksp.parse_line(line, i)
-        ksp.set_last()
         self._log_msg(logging.INFO, '------ Connecting to host... ------')
         # opening socket
         client_socket = socket.socket()
@@ -114,3 +121,4 @@ class NetworkMode(BaseMode):
 
         client_socket.close()
         self._log_msg(logging.INFO, '----- Paylod successfully sent -----')
+        return 0
