@@ -1,6 +1,5 @@
 # C project: Bachelor Thesis
 BUILD_DIR=./pico_build
-OS_NAME="Linux"
 
 ##############################################
 
@@ -42,6 +41,6 @@ test_show_coverage: test
 ##############################################
 
 $(BUILD_DIR)/Makefile: CMakeLists.txt ./rubber_ducky/*
-	cmake -H. -B$(BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES -DPICO_SDK_PATH=pico-sdk/ -DOS_NAME=$(OS_NAME)
+	cmake -H. -B$(BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES -DPICO_SDK_PATH=pico-sdk/
 	cp $(BUILD_DIR)/compile_commands.json .
 
