@@ -7,6 +7,6 @@ class TuiMode(BaseMode):
         # TODO:
 
 
-    def run(self):
+    def run(self) -> int:
         # TODO:
         return super().run()

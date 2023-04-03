@@ -1,4 +1,5 @@
 import logging
+import sys
 
 from abc import ABC, abstractmethod
 
@@ -15,11 +16,14 @@ class BaseMode(ABC):
         self._verbose = verbose
 
     @abstractmethod
-    def run(self):
+    def run(self) -> int:
         """Entry point of the program.
 
         Params:
             verbose (bool): Enable logging.
+
+        Return:
+            int: Error code; 0 for no error
         """
         pass
 
@@ -32,3 +36,10 @@ class BaseMode(ABC):
         fnc = LOG_FUN.get(_type)
         if fnc:
             fnc(msg)
+
+
+    def _display_nonverbose_error_msg(self):
+        if not self._verbose:
+            sys.stderr.write(
+                'Error occured. Toggle -v flag to see the error message.\n'
+            )
