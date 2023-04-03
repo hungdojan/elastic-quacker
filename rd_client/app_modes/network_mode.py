@@ -37,7 +37,7 @@ class NetworkMode(BaseMode):
                                   for i, val in enumerate(buffer)])
         elif len(buffer) > 4:
             # expected error message
-            data_str += buffer[4:].decode()
+            data_str += buffer[4:-1].decode()
         return f'{prefix_str:<23}[{data_str}]'
 
 
