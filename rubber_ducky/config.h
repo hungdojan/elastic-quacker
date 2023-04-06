@@ -23,4 +23,8 @@
     #define WIFI_PSWD "TheCakeIsALie"
 #endif
 
+#ifndef DEBUG_CAPS_LOCK
+    #define DEBUG_CAPS_LOCK 0
+#endif
+
 #endif // _CONFIG_H_

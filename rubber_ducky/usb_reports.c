@@ -15,8 +15,6 @@
 #include "pico/cyw43_arch.h"
 #include "usb_general.h"
 
-#define DEBUG_CAPS_LOCK
-
 // report description for keyboard
 uint8_t const hid_report[] = {
     // TUD_HID_REPORT_DESC_KEYBOARD()
@@ -86,7 +84,7 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id,
     (void) report_type;
     (void) buffer;
     (void) bufsize;
-#ifdef DEBUG_CAPS_LOCK
+#if DEBUG_CAPS_LOCK
     if (buffer == NULL || bufsize <= 0)
         return;
     if (report_type != HID_REPORT_TYPE_OUTPUT)
