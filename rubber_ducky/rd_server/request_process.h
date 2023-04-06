@@ -1,3 +1,14 @@
+/**
+ * @brief Declaring list of functions used for generating response packets.
+ *
+ * This source code serves as the submission to my bachelor thesis topic
+ * "Implement Rubber Duckies on Available USB Devices and Make a Practical Test"
+ * at FIT, BUT 2022/23.
+ *
+ * @file request_process.h
+ * @author Hung Do
+ * @date 06/04/2023
+ */
 #ifndef _REQUEST_PROCESS_H_
 #define _REQUEST_PROCESS_H_
 

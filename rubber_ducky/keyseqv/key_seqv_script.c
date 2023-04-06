@@ -3,7 +3,7 @@
  *
  * This particular set of key sequence opens openai.com page in firefox using terminal.
  *
- * This source code serves as submission to my bachelor thesis topic
+ * This source code serves as the submission to my bachelor thesis topic
  * "Implement Rubber Duckies on Available USB Devices and Make a Practical Test"
  * at FIT, BUT 2022/23.
  *
@@ -16,7 +16,7 @@
 /// List of key sequences for (my) Linux system
 struct key_seqv_t key_seqvs[] = {
 
-    {  0, {KEYBOARD_MODIFIER_LEFTALT, 0, {HID_KEY_ENTER, 0,}}, false},
+    {  0, {KEYBOARD_MODIFIER_LEFTCTRL|KEYBOARD_MODIFIER_LEFTALT, 0, {HID_KEY_T}}, false},
     {500, {0, 0, {0,}}, false},
     {  0, {0, 0, {HID_KEY_F, HID_KEY_I, HID_KEY_R, HID_KEY_E}}, false},
     {  0, {0, 0, {0,}}, false},

@@ -27,10 +27,10 @@ export_req:
 	poetry export --without-hashes --format=requirements.txt > requirements.txt
 
 run_cli:
-	poetry run app -v
+	@poetry run app -v
 
 run_client:
-	poetry run app -vn -p 5000 -H 192.168.4.1
+	@poetry run app -vn -p 5000 -H 192.168.4.1
 
 test:
 	poetry run coverage run -m pytest -vv && poetry run coverage report -m

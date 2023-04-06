@@ -1,7 +1,7 @@
 /**
  * @brief Main file with initialization functions.
  *
- * This source code serves as submission to my bachelor thesis topic
+ * This source code serves as the submission to my bachelor thesis topic
  * "Implement Rubber Duckies on Available USB Devices and Make a Practical Test"
  * at FIT, BUT 2022/23.
  *
@@ -66,7 +66,7 @@ int main(void) {
     dhcp_server_t dhcp_server;
     dhcp_server_init(&dhcp_server, &(nd.gateway), &(nd.mask));
 
-    init_server(sd, 5000);
+    init_server(sd, _TCP_SERVER_PORT);
 #endif // WIFI_ENABLE
 
     tusb_init();
@@ -86,6 +86,7 @@ int main(void) {
     dhcp_server_deinit(&dhcp_server);
     free(sd);
 #endif // WIFI_ENABLE
+
     cyw43_arch_deinit();
     return 0;
 }

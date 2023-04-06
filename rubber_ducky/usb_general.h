@@ -1,3 +1,14 @@
+/**
+ * @brief Declaring USB utility functions used in the project.
+ *
+ * This source code serves as the submission to my bachelor thesis topic
+ * "Implement Rubber Duckies on Available USB Devices and Make a Practical Test"
+ * at FIT, BUT 2022/23.
+ *
+ * @file usb_general.h
+ * @author Hung Do
+ * @date 06/04/2023
+ */
 #ifndef _USB_GENERAL_H_
 #define _USB_GENERAL_H_
 #include "tusb.h"

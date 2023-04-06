@@ -1,3 +1,14 @@
+/**
+ * @brief Defining list of functions used for generating response packets.
+ *
+ * This source code serves as the submission to my bachelor thesis topic
+ * "Implement Rubber Duckies on Available USB Devices and Make a Practical Test"
+ * at FIT, BUT 2022/23.
+ *
+ * @file request_process.c
+ * @author Hung Do
+ * @date 06/04/2023
+ */
 #include "request_process.h"
 
 #define PUSH_ERR_MSG \
@@ -143,4 +154,5 @@ size_t too_big_pl(uint8_t *buffer, size_t buffer_size) {
                            buffer_size
     );
 }
+
 /* request_process.c */

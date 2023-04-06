@@ -1,7 +1,7 @@
 /**
  * @brief Defines key sequence functions.
  *
- * This source ocude serves as submission to my bachelor thesis topic
+ * This source ocude serves as the submission to my bachelor thesis topic
  * "Implement Rubber Duckies on Available USB Devices and Make a Practical Test"
  * at FIT, BUT 2022/23.
  *

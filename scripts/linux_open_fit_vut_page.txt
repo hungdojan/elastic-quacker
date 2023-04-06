@@ -1,0 +1,3 @@
+# This script will open fit.vut.cz webpage in firefox using terminal
+# tested on Ubuntu 22.04 LTS operating system.
+<c-a-t><DELAY 500>firefox fit.vut.cz<\enter>

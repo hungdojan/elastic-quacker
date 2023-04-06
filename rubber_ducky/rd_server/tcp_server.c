@@ -1,3 +1,14 @@
+/**
+ * @brief Implementation of TCP server using lwIP library.
+ *
+ * This source code serves as the submission to my bachelor thesis topic
+ * "Implement Rubber Duckies on Available USB Devices and Make a Practical Test"
+ * at FIT, BUT 2022/23.
+ *
+ * @file tcp_server.c
+ * @author Hung Do
+ * @date 06/04/2023
+ */
 #include "tcp_server.h"
 #include "request_process.h"
 
@@ -167,4 +178,5 @@ void close_server(struct server_data_t *sd) {
         sd->pcb = NULL;
     }
 }
+
 /* tcp_server.c */

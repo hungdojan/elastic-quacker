@@ -1,3 +1,14 @@
+/**
+ * @brief File containing all important configuration macros.
+ *
+ * This source code serves as the submission to my bachelor thesis topic
+ * "Implement Rubber Duckies on Available USB Devices and Make a Prictical Test"
+ * at FIT, BUT 2022/23.
+ *
+ * @file config.h
+ * @author Hung Do
+ * @date 06/04/2023
+ */
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
@@ -21,6 +32,7 @@
 #if WIFI_ENABLE
     #define WIFI_SSID "RubberDucky_WiFi"
     #define WIFI_PSWD "TheCakeIsALie"
+    #define _TCP_SERVER_PORT 5000
 #endif
 
 #ifndef DEBUG_CAPS_LOCK

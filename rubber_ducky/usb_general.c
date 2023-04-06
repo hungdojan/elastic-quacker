@@ -1,3 +1,14 @@
+/**
+ * @brief Defining USB utility functions used in the project.
+ *
+ * This source code serves as the submission to my bachelor thesis topic
+ * "Implement Rubber Duckies on Available USB Devices and Make a Practical Test"
+ * at FIT, BUT 2022/23.
+ *
+ * @file usb_general.c
+ * @author Hung Do
+ * @date 06/04/2023
+ */
 #include "usb_general.h"
 #include "pico/cyw43_arch.h"    // cyw43_arch_gpio_put
 #include "boards/pico_w.h"      // CYW43_WL_GPIO_LED_PIN
