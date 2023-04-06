@@ -205,7 +205,19 @@ MODIFIER_MAP = {
 # e. g.: to press the combination a-s-., write <a-gt>; <a->> is syntax error
 MACRO_KEYS = {
     'lt': (Modifier.LSHIFT, Key.KEY_COMMA),
-    'gt': (Modifier.LSHIFT, Key.KEY_PERIOD)
+    'gt': (Modifier.LSHIFT, Key.KEY_PERIOD),
+    'control_left': (Modifier.LCTRL, None),
+    'shift_left': (Modifier.LSHIFT, None),
+    'alt_left': (Modifier.LALT, None),
+    'meta_left': (Modifier.LMETA, None),
+    'control_right': (Modifier.LCTRL, None),
+    'shift_right': (Modifier.RSHIFT, None),
+    'alt_right': (Modifier.RALT, None),
+    'meta_right': (Modifier.RMETA, None),
+    'ctrl': (Modifier.LCTRL, None),
+    'shift': (Modifier.LSHIFT, None),
+    'alt': (Modifier.LALT, None),
+    'meta': (Modifier.LMETA, None),
 }
 
 # list of special key names
@@ -271,13 +283,6 @@ SPECIAL_MAP = {
     'num_9': Key.KEY_KEYPAD_9,
     'num_0': Key.KEY_KEYPAD_0,
     'num_decimal': Key.KEY_KEYPAD_DECIMAL,
-    'shift_left': Key.KEY_SHIFT_LEFT,
-    'alt_left': Key.KEY_ALT_LEFT,
-    'gui_left': Key.KEY_GUI_LEFT,
-    'control_right': Key.KEY_CONTROL_RIGHT,
-    'shift_right': Key.KEY_SHIFT_RIGHT,
-    'alt_right': Key.KEY_ALT_RIGHT,
-    'gui_right': Key.KEY_GUI_RIGHT,
 
     # special keys that are usually not on the keyboard
     'europe_1': Key.KEY_EUROPE_1,
