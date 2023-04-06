@@ -23,7 +23,11 @@
 
 #define _CONFIG_LEN 9
 #define _HID_LEN (9+9+7)
-#define _MSC_LEN (9+7+7)
+#if CFG_TUD_MSC
+    #define _MSC_LEN (9+7+7)
+#else
+    #define _MSC_LEN (0)
+#endif
 #define _CONFIG_TOTAL_LENGTH (_CONFIG_LEN + _HID_LEN + _MSC_LEN)
 
 enum {
@@ -100,6 +104,7 @@ tusb_desc_endpoint_t const desc_ep_hid = {
     .bInterval          = 5,
 };
 
+#if CFG_TUD_MSC
 // ===================== MSC class =====================
 // MSC interface
 tusb_desc_interface_t const desc_itf_msc = {
@@ -133,7 +138,7 @@ tusb_desc_endpoint_t const desc_ep_msc_out = {
     .wMaxPacketSize     = CFG_TUD_MSC_EP_BUFSIZE,
     .bInterval          = 0,
 };
-
+#endif // CFG_TUD_MSC
 // =====================================================
 
 
@@ -171,7 +176,7 @@ uint8_t const * tud_descriptor_configuration_cb(uint8_t index) {
     // HID Endpoint descriptor
     memcpy(config_buffer + offset, (uint8_t *)&desc_ep_hid, desc_ep_hid.bLength);
     offset += desc_ep_hid.bLength;
-
+#if CFG_TUD_MSC
     // MSC Interface descriptor
     memcpy(config_buffer + offset, (uint8_t *)&desc_itf_msc, desc_itf_msc.bLength);
     offset += desc_itf_msc.bLength;
@@ -182,6 +187,7 @@ uint8_t const * tud_descriptor_configuration_cb(uint8_t index) {
 
     // MSC Input Endpoint descriptor
     memcpy(config_buffer + offset, (uint8_t *)&desc_ep_msc_in, desc_ep_msc_in.bLength);
+#endif // CFG_TUD_MSC
 
     return (uint8_t const *) config_buffer;
 }

@@ -17,9 +17,6 @@
 #include "tcp_server.h"         // init_server
 #include "dhcpserver/dhcpserver.h"
 
-#define WIFI_SSID "picow_test"
-#define WIFI_PSWD "password"
-
 /**
  * @brief Send a key sequence using HID report.
  *
@@ -52,6 +49,8 @@ int main(void) {
     board_init();
     if (cyw43_arch_init())
         return 1;
+
+#if WIFI_ENABLE
     struct server_data_t *sd = (struct server_data_t *)calloc(1, sizeof(struct server_data_t));
     if (sd == NULL)
         return 1;
@@ -68,6 +67,7 @@ int main(void) {
     dhcp_server_init(&dhcp_server, &(nd.gateway), &(nd.mask));
 
     init_server(sd, 5000);
+#endif // WIFI_ENABLE
 
     tusb_init();
 
@@ -81,9 +81,11 @@ int main(void) {
         delay = send_report();
         sleep_ms(delay);
     }
-
+#if WIFI_ENABLE
     close_server(sd);
     dhcp_server_deinit(&dhcp_server);
+    free(sd);
+#endif // WIFI_ENABLE
     cyw43_arch_deinit();
     return 0;
 }
