@@ -248,10 +248,16 @@ class KeySeqvParser:
             if special_value.lower() in MACRO_KEYS:
                 # add shift if not toggled yet
                 key_modifier, key_value = MACRO_KEYS[special_value.lower()]
-                if key_modifier and key_modifier not in used_modifiers:
-                    used_modifiers.append(key_modifier)
+                if key_modifier:
+                    if key_modifier in used_modifiers:
+                        self._create_log(logging.WARN,
+                                     f'Duplicate use of modifier "{key_modifier}" in ' \
+                                     f'"{match[Groups.SPECIAL_ORIGINAL.value]}" on line {line_index+1}')
+                    else:
+                        used_modifiers.append(key_modifier)
 
-                self._ks_struct['keys'].append(key_value)
+                if key_value:
+                    self._ks_struct['keys'].append(key_value)
                 self._ks_struct['modifiers'] = used_modifiers
                 if match[Groups.SPECIAL_HOLD_DELAY.value]:
                     self._ks_struct['delay'] = int(match[Groups.SPECIAL_HOLD_DELAY.value])
