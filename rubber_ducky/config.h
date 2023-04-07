@@ -12,7 +12,21 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
-#define CFG_TUD_HID 1
+// enables keyboard
+#ifndef CFG_TUD_HID
+    #define CFG_TUD_HID 1
+#endif
+
+// slowing down key presses for more stable performance
+// without this delay, the device/host struggles with registering
+// modifier key presses (for example shift)
+// if you computer still struggles with modifier keys
+// try increasing the delay constant
+// otherwise decrease the delay constant for faster typing (if needed)
+// minimal value is 0
+#ifndef KEYPRESS_DELAY_MS
+    #define KEYPRESS_DELAY_MS 20
+#endif
 
 // enable mass storage simulation
 #ifndef CFG_TUD_MSC

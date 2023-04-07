@@ -79,7 +79,11 @@ int main(void) {
     while (1) {
         tud_task(); // tinyusb device task
         delay = send_report();
-        sleep_ms(delay);
+        if (delay) {
+            sleep_ms(delay);
+        } else {
+            sleep_ms(KEYPRESS_DELAY_MS);
+        }
     }
 #if WIFI_ENABLE
     close_server(sd);
