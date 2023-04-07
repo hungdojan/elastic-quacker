@@ -20,6 +20,9 @@
 #define BYTES_PER_SECTOR 512u
 #define NUM_OF_SECTORS 16u
 
+// autostart toggle
+#define AUTOSTART (!(DEBUG_CAPS_LOCK) || AUTOSTART_AFTER_PLUGIN)
+
 // convert u32 to four u8 numbers using LE
 #define FILE_SIZE(_size) \
     (uint8_t)((_size) & 0xff), \

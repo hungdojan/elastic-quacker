@@ -1,0 +1,25 @@
+# This script plays the first training level in TrackMania (2020)
+# Recommended configurations:
+#   CFG_TUD_MSC 0
+#   DEBUG_CAPS_LOCK 1
+#   AUTOSTART_AFTER_PLUGIN 0
+# Double tap CAPS_LOCK on your keyboard after the start to
+# toggle the script
+
+# downhill
+<3350-w>
+
+# first turn
+<500-d>
+<900-wd>
+<300-w>
+
+# second turn
+<500-a>
+<800-aw>
+<600-w>
+
+# third turn
+<500-d>
+<500-wd>
+<1500-w>

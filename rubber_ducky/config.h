@@ -49,8 +49,17 @@
     #define _TCP_SERVER_PORT 5000
 #endif
 
+// allow the user to rerun the script with caps_lock double press
+// the script will start running after caps lock's led turns off
 #ifndef DEBUG_CAPS_LOCK
-    #define DEBUG_CAPS_LOCK 0
+    #define DEBUG_CAPS_LOCK 1
+#endif
+
+// tells the rubber ducky device to start running the script after plugging in
+// only works when DEBUG_CAPS_LOCK is set to 1
+// otherwise this macro will have no use
+#ifndef AUTOSTART_AFTER_PLUGIN
+    #define AUTOSTART_AFTER_PLUGIN 0
 #endif
 
 #endif // _CONFIG_H_

@@ -32,7 +32,9 @@
 
 enum {
     ITF_NUM_HID,
+#if CFG_TUD_MSC
     ITF_NUM_MSC,
+#endif
     ITF_NUM_TOTAL
 };
 
