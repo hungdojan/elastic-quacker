@@ -50,10 +50,15 @@ class KeySeqvParser:
 
 
     def set_last(self):
-        """Set last item's last flag."""
-        if self._lof_keyseqvs:
-            last_item = self._lof_keyseqvs[-1]
-            last_item.last = True
+        """Set last item's last flag.
+
+        If no item is present in the list create a new one with no keys
+        and add it into the list.
+        """
+        if not self._lof_keyseqvs:
+            self._lof_keyseqvs.append(KeySeqv([]))
+        last_item = self._lof_keyseqvs[-1]
+        last_item.last = True
 
 
     def __new_sequece_structure(self):
