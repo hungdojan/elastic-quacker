@@ -1,5 +1,7 @@
 # C project: Bachelor Thesis
 BUILD_DIR=./pico_build
+CMAKE_MACROS=-DCMAKE_BUILD_TYPE=Debug -DPICO_SDK_PATH=pico-sdk/
+#CMAKE_MACROS+=-DCMAKE_EXPORT_COMPILE_COMMANDS=YES
 
 ##############################################
 
@@ -17,7 +19,7 @@ doc: Doxygen
 	doxygen
 
 clean:
-	rm -rf doc *.zip $(BUILD_DIR) .coverage tests/reports/
+	rm -rf doc *.zip $(BUILD_DIR) .coverage tests/reports/ compile_commands.json
 
 ####### RD Client python commands ############
 
@@ -41,6 +43,6 @@ test_show_coverage: test
 ##############################################
 
 $(BUILD_DIR)/Makefile: CMakeLists.txt ./rubber_ducky/*
-	cmake -H. -B$(BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES -DPICO_SDK_PATH=pico-sdk/
-	cp $(BUILD_DIR)/compile_commands.json .
+	cmake -H. -B$(BUILD_DIR) $(CMAKE_MACROS)
+	if [ -f "$(BUILD_DIR)/compile_commands.json" ]; then cp $(BUILD_DIR)/compile_commands.json .; fi
 

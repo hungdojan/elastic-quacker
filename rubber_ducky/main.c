@@ -69,10 +69,10 @@ int main(void) {
     init_server(sd, _TCP_SERVER_PORT);
 #endif // WIFI_ENABLE
 
-    tusb_init();
+    tud_init(BOARD_TUD_RHPORT);
 
     // initial booting delay
-    active_delay(1500000);
+    active_delay(_INITIAL_BOOT_DELAY);
 
     // main program loop
     uint32_t delay = 0;

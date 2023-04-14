@@ -2,10 +2,10 @@ import logging
 import sys
 
 from rd_client.parser.error import ParserError
+from rd_client.parser import KeySeqvParser
 
 from .base import BaseMode
 from datetime import datetime
-from rd_client.parser import KeySeqvParser
 
 HEADER_CONTENT = \
 """/**

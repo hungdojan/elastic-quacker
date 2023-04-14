@@ -2,11 +2,11 @@ import logging
 import socket
 import sys
 
+from rd_client.parser import KeySeqvParser
 from rd_client.parser.error import ParserError
+from rd_client.payload import create_payload, OperationCodes
 
 from .base import BaseMode
-from rd_client.parser import KeySeqvParser
-from rd_client.payload import create_payload, OperationCodes
 
 class NetworkMode(BaseMode):
     """Cli mode for sending RubberDucky script to RubberDucky device using
