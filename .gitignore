@@ -8,8 +8,7 @@ pico_sdk_import.cmake
 
 doc/
 .ccls-cache/
-build/
-pico_build/
+build*/
 .venv/
 __pycache__/
 .vscode/

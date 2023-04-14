@@ -1,5 +1,5 @@
 # C project: Bachelor Thesis
-BUILD_DIR=./pico_build
+BUILD_DIR=./build_rd
 CMAKE_MACROS=-DCMAKE_BUILD_TYPE=Debug -DPICO_SDK_PATH=pico-sdk/
 #CMAKE_MACROS+=-DCMAKE_EXPORT_COMPILE_COMMANDS=YES
 
@@ -15,18 +15,12 @@ build: $(BUILD_DIR)/Makefile
 rubber_ducky: $(BUILD_DIR)/Makefile
 	make -C$(BUILD_DIR) -j8 rubber_ducky
 
-doc: Doxygen
-	doxygen
-
 clean:
-	rm -rf doc *.zip $(BUILD_DIR) .coverage tests/reports/ compile_commands.json
+	rm -rf $(BUILD_DIR) .coverage tests/reports/ compile_commands.json
 
 ####### RD Client python commands ############
 
-.PHONY: export_req test test_show_coverage
-
-export_req:
-	poetry export --without-hashes --format=requirements.txt > requirements.txt
+.PHONY: test test_show_coverage
 
 run_cli:
 	@poetry run app -v
