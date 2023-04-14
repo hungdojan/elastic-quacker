@@ -52,7 +52,7 @@
 // allow the user to rerun the script with caps_lock double press
 // the script will start running after caps lock's led turns off
 #ifndef DEBUG_CAPS_LOCK
-    #define DEBUG_CAPS_LOCK 1
+    #define DEBUG_CAPS_LOCK 0
 #endif
 
 // tells the rubber ducky device to start running the script after plugging in

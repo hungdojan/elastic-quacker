@@ -1,6 +1,6 @@
 # C project: Bachelor Thesis
 BUILD_DIR=./build_rd
-CMAKE_MACROS=-DCMAKE_BUILD_TYPE=Debug -DPICO_SDK_PATH=pico-sdk/
+CMAKE_MACROS=-DCMAKE_BUILD_TYPE=Release -DPICO_SDK_PATH=pico-sdk/
 #CMAKE_MACROS+=-DCMAKE_EXPORT_COMPILE_COMMANDS=YES
 
 ##############################################
