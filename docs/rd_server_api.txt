@@ -53,9 +53,9 @@ Possible responses:
     +----+-------------+---------------------------+-----------+
     | op | payload_len |       description         | sent data |
     +----+-------------+---------------------------+-----------+
-    | 0a |  variable   | Request was successfully  | data from |
+    | 0a |   varies    | Request was successfully  | data from |
     |    |             |         processed         |   server  |
     +----+-------------+---------------------------+-----------+
-    | 0b |  variable   | Request was not correctly |   error   |
+    | 0b |   varies    | Request was not correctly |   error   |
     |    |             |         processed         |  message  |
     +----+-------------+---------------------------+-----------+
