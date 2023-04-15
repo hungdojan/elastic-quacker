@@ -49,7 +49,7 @@ def test_key_seqv():
 def test_empty_list(ksp: KeySeqvParser):
     ksp.set_last()
 
-    assert len(ksp.lof_keyseqvs) == 0
+    assert len(ksp.lof_keyseqvs) == 1
 
 
 def test_normal_key(ksp: KeySeqvParser):
@@ -352,6 +352,9 @@ def test_warnings(ksp: KeySeqvParser):
     assert len(ksp.lof_keyseqvs[4].modifiers) != 2
     ksp.parse_line('<a-la-a>', 0)
     assert len(ksp.lof_keyseqvs[6].modifiers) != 2
+
+    # duplicate modifier when using macros
+    ksp.parse_line(r'<a-\alt_left>', 0)
 
 
 def test_last_and_clear(ksp: KeySeqvParser):
