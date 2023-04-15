@@ -51,7 +51,7 @@ class CliMode(BaseMode):
     def run(self) -> int:
         ksp = KeySeqvParser(self._verbose)
 
-        self._log_msg(logging.INFO, "------ Start parsing script ------")
+        self._log_msg(logging.INFO, '------ Start parsing script ------')
         try:
             # parse the file/from stdin
             with self._in_f as f:
@@ -63,12 +63,13 @@ class CliMode(BaseMode):
             self._display_nonverbose_error_msg()
             return 1
 
-        self._log_msg(logging.INFO, "------- Writing to output -------")
+        self._log_msg(logging.INFO, '------- Writing to output -------')
         # write into output file/stdout
         with self._out_f as f:
             f.write(HEADER_CONTENT)
             for ks in ksp.lof_keyseqvs:
                 f.write(str(ks))
             f.write(FOOTER_CONTENT)
-        self._log_msg(logging.INFO, "-------- Writing finished --------")
+        self._log_msg(logging.INFO, '-------- Writing finished --------')
+        self._log_msg(logging.INFO, f'Number of key sequences: {len(ksp.lof_keyseqvs)}')
         return 0

@@ -46,7 +46,6 @@ class NetworkMode(BaseMode):
 
         prefix_str = f'{prefix} - {OperationCodes(int(buffer[0])).name}: '
         data_str = ''
-        # format_str = f'{prefix} - {OperationCodes(int(buffer[0])).name}: '
         if len(buffer) > 4:
             # display hex format
             data_str += ' '.join([f'{val:02x}{" " if (i+1) % 8 == 0 else ""}'
@@ -128,5 +127,6 @@ class NetworkMode(BaseMode):
         _send_run_command(client_socket)
 
         client_socket.close()
-        self._log_msg(logging.INFO, '----- Paylod successfully sent -----')
+        self._log_msg(logging.INFO, '----- Payload successfully sent -----')
+        self._log_msg(logging.INFO, f'Number of key sequences: {len(ksp.lof_keyseqvs)}')
         return 0

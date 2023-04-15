@@ -10,8 +10,8 @@ Year: 2022/2023
   - [Requirements](#requirements)
   - [Setting up this project](#setting-up-this-project)
   - [Compile project and upload to the device](#compile-project-and-upload-to-the-device)
-  - [RD Script parser](#rd-script-parser)
-  - [Configuration and RD Script language rules](#configuration-and-rd-script-language-rules)
+  - [RD script parser](#rd-script-parser)
+  - [Configuration and RD script language rules](#configuration-and-rd-script-language-rules)
   - [Make commands](#make-commands)
     - [Basic usage](#basic-usage)
 
@@ -62,7 +62,7 @@ cmake -H. -B'build_rd' -DPICO_SDK_PATH=pico-sdk/ && make -C'build_rd' -j8
 
 The `Makefile` script offers more actions which you can find all of them listed [here](#make-commands).
 
-## RD Script parser
+## RD script parser
 Additionally, I created a Python script that converts a custom `RD script` to a series of key presses readable by our Rubber Ducky device. `rd_client` module app currently supports 2 modes:
 - **CLI mode**    - Used to convert `RD script` to C source code. Replace the output with `rubber_ducky/
 - **Client mode** - Send the transformed `RD script` over TCP socket. Need to be connected to Rubber Ducky Wifi.
@@ -88,15 +88,37 @@ options:
   -v, --verbose                     Enable logging.
 ```
 
-## Configuration and RD Script language rules
-TODO:
+## Configuration and RD script language rules
+User is allowed to modify Rubber Ducky's device configuration file `rubber_ducky/config.h`. Check the [configuration documentation](docs/configuration.md) for more detailed information.
+
+`RD script` is a custom language designed to allow user to easily write the payloads. It is inspired by vim key notations. The language supports:
+- [x] **single line comments**
+- [x] **setting delays** - wait for a defined time period before pressing another keys
+- [x] **holding delay** - keys are pressed for a defined time period
+- [x] **huge selection of keys to press** - list of them can be found [here]()
+- [x] **up to 6 keys + modifiers simultaneously pressed** - allows to run shortcuts
+  - doesn't include *special keys*, only one *special key* can be pressed at a time (plan to update this in the future)
+
+You can find more information related to `RD script` language [here](docs/rd_script.md).
+
+```
+# example script that opens terminal and list out current directory's content
+# Ubuntu's keyboard shortcut for opening terminal is Ctrl+Alt+t
+<c-a-t>
+
+# wait for the terminal to open (500 ms)
+<DELAY 500>
+
+# run the command
+ls<\enter>
+```
 
 ## Make commands
 The given `Makefile` contains 7 useful commands that the user can call. They are all listed below:
 - `make` or `make build` - Calls `cmake` and compiles the project in `pico-build` directory. If enabled this command will also generate `compile_commands.json` file.
 - `make clean`      - Removes generated files from the project directory.
-- `make run_cli`    - Runs a Python script which transform `rd_script` file into C source code.
-- `make run_client` - Once connected to Rubber Ducky's WiFi, this command can be used to send a new `rd_script` to the USB device.
+- `make run_cli`    - Runs a Python script which transform `RD script` file into C source code.
+- `make run_client` - Once connected to Rubber Ducky's WiFi, this command can be used to send a new `RD script` to the USB device.
 - `make test`       - Runs a Python unit tests and shows the coverage. Requires **poetry**. 
 - `make test_show_coverage` - Runs a Python unit tests and shows the coverage in the `firefox`. Requires **poetry** and **firefox**. 
 
@@ -211,5 +233,5 @@ INFO :: Sent - SET_EDITABLE:   [00]
 INFO :: Recv - RESPONSE_OK:    [0a 00 00 00]
 INFO :: Sent - RUN_SEQUENCES:  []
 INFO :: Recv - RESPONSE_OK:    [0a 00 00 00]
-INFO :: ----- Paylod successfully sent -----
+INFO :: ----- Payload successfully sent -----
 ```
