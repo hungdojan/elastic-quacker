@@ -4,4 +4,5 @@
 #   CFG_TUD_MSC 0
 #   DEBUG_CAPS_LOCK 1
 #   AUTOSTART_AFTER_PLUGIN 1
+
 <c-a-t><DELAY 500>firefox fit.vut.cz<\enter>

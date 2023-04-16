@@ -4,7 +4,7 @@
 #   DEBUG_CAPS_LOCK 1
 #   AUTOSTART_AFTER_PLUGIN 0
 # Double tap CAPS_LOCK on your keyboard after the start to
-# toggle the script
+# execute the payload
 
 # downhill
 <3350-w>

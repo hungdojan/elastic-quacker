@@ -25,7 +25,13 @@
 #define PAYLOAD_TOO_BIG_ERR_MSG \
     "Packet's payload is too big and cannot be processed."
 
-#define PACKET_DBG 1
+#define DEVICE_IN_READWRITE_MODE_ERR_MSG \
+    "To execute this command the device must be set to read-only mode. " \
+    "Call SET_EDITABLE with 0 before running this command."
+
+#define DEVICE_IN_READONLY_MODE_ERR_MSG \
+    "To execute this command the device must be set to read-write mode. " \
+    "Call SET_EDITABLE with 1 before running this command."
 
 /**
  * @brief Create a response packet.
@@ -68,6 +74,13 @@ size_t get_editable_pl(uint8_t *buffer, size_t buffer_size) {
 }
 
 size_t clear_data_pl(uint8_t *buffer, size_t buffer_size) {
+    // check if device is already in read-write mode
+    if (!key_seqv_is_read_write())
+        return create_response(OP_IN_ERR,
+                               DEVICE_IN_READONLY_MODE_ERR_MSG,
+                               strlen(DEVICE_IN_READONLY_MODE_ERR_MSG) + 1,
+                               buffer,
+                               buffer_size);
     key_seqv_clear();
 
     return create_response(OP_IN_OK, NULL, 0, buffer, buffer_size);
@@ -131,7 +144,14 @@ size_t reset_debug_line_index_pl(uint8_t *buffer, size_t buffer_size) {
 }
 
 size_t run_sequences(uint8_t *buffer, size_t buffer_size) {
-    key_seqv_reset_index_counter(false);
+    // check if device is already in read-only mode
+    if (key_seqv_is_read_write())
+        return create_response(OP_IN_ERR,
+                               DEVICE_IN_READWRITE_MODE_ERR_MSG,
+                               strlen(DEVICE_IN_READWRITE_MODE_ERR_MSG) + 1,
+                               buffer,
+                               buffer_size);
+    key_seqv_run_sequences(false);
 
     // create a response
     return create_response(OP_IN_OK, NULL, 0, buffer, buffer_size);

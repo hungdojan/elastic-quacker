@@ -26,24 +26,29 @@ Operation codes and their values:
     | 02 |     00      |      --      |      Check device's      |
     |    |             |              |  read-write mode status  |
     +----+-------------+--------------+--------------------------+
-    | 03 |     00      |      --      |      Clear device's      |
+    | 03 |     00      |      --      |      Clear device's      | *
     |    |             |              |     current payload      |
     +----+-------------+--------------+--------------------------+
-    | 04 |     0d      | key sequence |  Send a new key sequence |
+    | 04 |     0d      | key sequence | Send a new key sequence  | *
     +----+-------------+--------------+--------------------------+
-    | 05 |     00      |      --      | Remove last key sequence |
+    | 05 |     00      |      --      | Remove last key sequence | *
     +----+-------------+--------------+--------------------------+
     | 06 |     00      |      --      | Retrieve a key sequence  |
-    |    |             |              | at the cursor's position |
+    |    |             |              |       at the debug       |
+    |    |             |              |     cursor's position    |
     +----+-------------+--------------+--------------------------+
-    | 07 |     00      |      --      | Move cursor to the next  |
-    |    |             |              |       key sequence       |
+    | 07 |     00      |      --      | Move dubug cursor to the |
+    |    |             |              |    next key sequence     |
     +----+-------------+--------------+--------------------------+
-    | 08 |     00      |      --      | Reset cursor's position  |
+    | 08 |     00      |      --      |   Reset debug cursor's   |
+    |    |             |              |         position         |
     +----+-------------+--------------+--------------------------+
-    | 09 |     00      |      --      | Tell the device to start |
+    | 09 |     00      |      --      | Tell the device to start | **
     |    |             |              |  executing the payload   |
     +----+-------------+--------------+--------------------------+
+
+*  - device must be set to read-write mode to run this command
+** - device must be set to read-only mode to run this command
 
 Response
 --------

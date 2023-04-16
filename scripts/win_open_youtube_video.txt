@@ -1,0 +1,8 @@
+# This scripts opens a youtube video in user's default browser
+# Recommended configurations:
+#   CFG_TUD_MSC 0
+#   DEBUG_CAPS_LOCK 0
+#   AUTOSTART_AFTER_PLUGIN 1
+
+<m-r><DELAY 200>powershell<\enter><DELAY 500>
+Start-Process https://www.youtube.com/watch?v=dQw4w9WgXcQ<\enter>

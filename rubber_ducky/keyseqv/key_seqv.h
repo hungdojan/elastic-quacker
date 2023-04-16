@@ -68,8 +68,7 @@ size_t key_seqv_debug_report(uint8_t *buffer, size_t buffer_size);
  * Read-write mode allows user to edit the key sequence list.
  * When the list is in read-write mode, the process of running
  * the list of sequences (sending commands to the host machine) is put on
- * halt. Only after the putting the list back to read-only mode, will
- * the device start running again.
+ * halt. To enable payload execution, call key_seqv_run_sequences().
  *
  * This function DOES NOT reset the index of the counter. User has to
  * reset it manually using key_seqv_reset_index_counter() function.
@@ -125,6 +124,8 @@ int key_seqv_get_len();
 
 /**
  * @brief Perform the stored key sequences.
+ *
+ * Reset key sequence index and enable key sequence execution.
  */
 void key_seqv_run_sequences();
 

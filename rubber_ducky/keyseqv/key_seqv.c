@@ -81,7 +81,8 @@ void key_seqv_set_mode(bool is_read_write) {
         return;
 
     read_write = is_read_write;
-    set_enable_key_seqv(!is_read_write);
+    if (is_read_write)
+        set_enable_key_seqv(false);
 
     // clear the list when used for the first time
     if (key_seqv_len < 0 && is_read_write) {
@@ -145,6 +146,7 @@ int key_seqv_get_len() {
 
 void key_seqv_run_sequences() {
     key_seqv_reset_index_counter(false);
+    set_enable_key_seqv(true);
 }
 
 /* key_seqv.c */
