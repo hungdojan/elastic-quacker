@@ -1,0 +1,23 @@
+# This payload installs Firefox web browser from powershell
+# using built-in Microsoft Edge
+# Tested on: Windows Sandbox in Windows 10
+# Recommended configurations:
+#   CFG_TUD_MSC 0
+#   DEBUG_CAPS_LOCK 0
+
+# open powershell using Windows Run feature
+<m-r><DELAY 500>powershell<\enter>
+
+# wait until powershell loads (Sandbox is slow)
+<DELAY 2000>
+
+# open Firefox download page and
+# wait for until download is done (depends on user's internet speed)
+start msedge 'https://www.mozilla.org/cs/firefox/download/thanks/'<\enter>
+<DELAY 3000>
+
+# expected location of the downloaded file is 'Downloads' folder
+# Alt-Tab back to powershell and finish the installation
+<a-\tab><DELAY 200>& '.\Downloads\Firefox Installer.exe'<\enter>
+
+# done

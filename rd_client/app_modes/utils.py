@@ -13,7 +13,7 @@ def __process_args() -> dict[str, Any]:
     """Process arguments.
 
     Returns dict structure: {
-        'host':     (str) IP adress of the RubberDucky device,
+        'host':     (str) IP address of the RubberDucky device,
         'input':    (str|None) File path to input file,
         'log_file': (str|None) File path to log file,
         'network':  (bool) Enable server-client mode,

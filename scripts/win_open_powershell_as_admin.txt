@@ -1,0 +1,7 @@
+# This payload opens powershell with administator privileges
+# Tested on: Windows 10
+# Recommended configurations:
+#   CFG_TUD_MSC 0
+#   DEBUG_CAPS_LOCK 1
+
+<m-r><DELAY 500>powershell<c-s-\enter><DELAY 2000><\arrow_left><\enter>

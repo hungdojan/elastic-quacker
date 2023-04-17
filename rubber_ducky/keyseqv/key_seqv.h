@@ -56,7 +56,7 @@ bool key_seqv_get_report(struct key_seqv_t * const report_out);
 /**
  * @brief Returns debug info of the current key sequence.
  *
- * @param [out] buffer Outputing buffer where function stores current key sequence data.
+ * @param [out] buffer Outputting buffer where function stores current key sequence data.
  * @param buffer_size  Buffer's max size.
  * @return Size of the buffer content.
  */
