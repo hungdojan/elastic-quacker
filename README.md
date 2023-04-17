@@ -14,9 +14,19 @@ Year: 2022/2023
   - [Configuration and RD script language rules](#configuration-and-rd-script-language-rules)
   - [Make commands](#make-commands)
     - [Basic usage](#basic-usage)
+  - [Contribution](#contribution)
 
 ## Introduction
-TODO:
+Rubber Ducky is a USB device produced by Hak5, a tool used for injecting keystrokes into the host machine. It can be used for penetration testing or educational purposes. My goal was to create a software that runs on top of Raspberry Pi Pico W that behaves in a similar way as a Rubber Ducky device. The project uses [TinyUSB](https://github.com/hathach/tinyusb) library to enable keyboard emulation. My software provides:
+- HID (keyboard) and MSC (mass storage) support.
+  - Mass Storage is a PoC feature (for now...).
+- `rd_client` parser that converts a payload written in custom `RD script` to C source code.
+- Control the USB device and upload new payloads wirelessly. You don't need to recompile the code everytime you fix change your payload.
+- Rerun your script without unplugging the device. Simple toggle the `DEBUG_CAPS_LOCK` feature before compiling the code.
+
+The result? See it for yourself (sound on):
+
+[![demo](https://user-images.githubusercontent.com/54320963/232480533-fa1e088d-04a4-4c68-8b43-03eba4fcc7cc.png)](https://user-images.githubusercontent.com/54320963/232480280-5fc0ccd4-238e-4b6c-9615-11bc435f6bd6.mp4)
 
 ## Requirements
 This project was developed and tested on `5.15.104-2-MANJARO x86_64 GNU/Linux` operating system.
@@ -149,7 +159,23 @@ INFO :: Keys: [enter]
 ^D
 INFO :: ------- Writing to output -------
 INFO :: -------- Writing finished --------
+INFO :: Number of key sequences: 12
 $
+$ echo "<\meta><DELAY 500>notepad<\enter><DELAY 500>hello world<\enter>" | make run_cli > /dev/null
+INFO :: ------ Start parsing script ------
+INFO :: Modifiers: [LMETA]; 
+INFO :: Wait: 500 ms; 
+INFO :: Keys: [n, o, t, e, p, a]
+INFO :: Keys: [d]
+INFO :: Keys: [enter]
+INFO :: Wait: 500 ms; 
+INFO :: Keys: [h, e, l]
+INFO :: Keys: [l, o, space, w]
+INFO :: Keys: [o, r, l, d]
+INFO :: Keys: [enter]
+INFO :: ------- Writing to output -------
+INFO :: -------- Writing finished --------
+INFO :: Number of key sequences: 16
 $
 $ make run_cli < scripts/linux_open_fit_vut_page.txt > rubber_ducky/keyseqv/key_seqv_script.c 
 INFO :: ------ Start parsing script ------
@@ -162,6 +188,7 @@ INFO :: Keys: [t, ., c, z]
 INFO :: Keys: [enter]
 INFO :: ------- Writing to output -------
 INFO :: -------- Writing finished --------
+INFO :: Number of key sequences: 12
 ```
 
 - Upload script to Rubber Ducky device using client mode. Replace `make run_client` with `python -m rd_client -vn -p 5000 -H 192.168.4.1`. The machine needs to be connected to Rubber Ducky's wifi network. Network's SSID and password can be found in `rubber_ducky/config.h` file. You can change those to your liking.
@@ -234,4 +261,8 @@ INFO :: Recv - RESPONSE_OK:    [0a 00 00 00]
 INFO :: Sent - RUN_SEQUENCES:  []
 INFO :: Recv - RESPONSE_OK:    [0a 00 00 00]
 INFO :: ----- Payload successfully sent -----
+INFO :: Number of key sequences: 20
 ```
+
+## Contribution
+Feel free to fork this repository and create a new projects on top of this. New feature suggestions or bug fixes are also welcomed. Have fun.
