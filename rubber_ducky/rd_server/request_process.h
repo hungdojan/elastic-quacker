@@ -40,9 +40,9 @@ enum oper_codes {
     OP_CLEAR_DATA,
     OP_PUSH_DATA,
     OP_POP_DATA,
-    OP_GET_DEBUG_LINE,
-    OP_INC_DEBUG_LINE,
-    OP_RESET_DEBUG_LINE_INDEX,
+    OP_GET_DEBUG_CURSOR,
+    OP_INC_DEBUG_CURSOR,
+    OP_RESET_DEBUG_CURSOR,
     OP_RUN_SEQUENCES,
 
     // outgoing
@@ -95,31 +95,31 @@ size_t push_data_pl(uint8_t *buffer, size_t buffer_size);
 size_t pop_data_pl(uint8_t *buffer, size_t buffer_size);
 
 /**
- * @brief Process "GET DEBUG LINE" packet.
+ * @brief Process "GET DEBUG CURSOR" packet.
  *
  * @param buffer      Received buffer with data.
  * @param buffer_size Buffer's max size.
  * @return Number of bytes written.
  */
-size_t get_debug_line_pl(uint8_t *buffer, size_t buffer_size);
+size_t get_debug_cursor_pl(uint8_t *buffer, size_t buffer_size);
 
 /**
- * @brief Process "INC DEBUG LINE" packet.
+ * @brief Process "INC DEBUG CURSOR" packet.
  *
  * @param buffer      Received buffer with data.
  * @param buffer_size Buffer's max size.
  * @return Number of bytes written.
  */
-size_t inc_debug_line_pl(uint8_t *buffer, size_t buffer_size);
+size_t inc_debug_cursor_pl(uint8_t *buffer, size_t buffer_size);
 
 /**
- * @brief Process "RESET DEBUG LINE INDEX" packet.
+ * @brief Process "RESET DEBUG CURSOR" packet.
  *
  * @param buffer      Received buffer with data.
  * @param buffer_size Buffer's max size.
  * @return Number of bytes written.
  */
-size_t reset_debug_line_index_pl(uint8_t *buffer, size_t buffer_size);
+size_t reset_debug_cursor_pl(uint8_t *buffer, size_t buffer_size);
 
 /**
  * @brief Process "RUN SEQUENCES" packet.

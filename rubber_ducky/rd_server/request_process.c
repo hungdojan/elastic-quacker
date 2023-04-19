@@ -122,21 +122,21 @@ size_t pop_data_pl(uint8_t *buffer, size_t buffer_size) {
     );
 }
 
-size_t get_debug_line_pl(uint8_t *buffer, size_t buffer_size) {
+size_t get_debug_cursor_pl(uint8_t *buffer, size_t buffer_size) {
     uint8_t tmp_buffer[20] = {0, };
     size_t len = key_seqv_debug_report(tmp_buffer, 20);
 
     return create_response(OP_IN_OK, tmp_buffer, len, buffer, buffer_size);
 }
 
-size_t inc_debug_line_pl(uint8_t *buffer, size_t buffer_size) {
+size_t inc_debug_cursor_pl(uint8_t *buffer, size_t buffer_size) {
     key_seqv_increase_counter(true);
 
     // create a response
     return create_response(OP_IN_OK, NULL, 0, buffer, buffer_size);
 }
 
-size_t reset_debug_line_index_pl(uint8_t *buffer, size_t buffer_size) {
+size_t reset_debug_cursor_pl(uint8_t *buffer, size_t buffer_size) {
     key_seqv_reset_index_counter(true);
 
     // create a response
@@ -151,7 +151,7 @@ size_t run_sequences(uint8_t *buffer, size_t buffer_size) {
                                strlen(DEVICE_IN_READWRITE_MODE_ERR_MSG) + 1,
                                buffer,
                                buffer_size);
-    key_seqv_run_sequences(false);
+    key_seqv_run_sequences();
 
     // create a response
     return create_response(OP_IN_OK, NULL, 0, buffer, buffer_size);

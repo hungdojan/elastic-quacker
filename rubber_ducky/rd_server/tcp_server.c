@@ -76,14 +76,14 @@ static err_t recv_cb(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
             case OP_POP_DATA:
                 packet_len = pop_data_pl(cd->buffer, CLIENT_BUFFER_SIZE);
                 break;
-            case OP_GET_DEBUG_LINE:
-                packet_len = get_debug_line_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+            case OP_GET_DEBUG_CURSOR:
+                packet_len = get_debug_cursor_pl(cd->buffer, CLIENT_BUFFER_SIZE);
                 break;
-            case OP_INC_DEBUG_LINE:
-                packet_len = inc_debug_line_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+            case OP_INC_DEBUG_CURSOR:
+                packet_len = inc_debug_cursor_pl(cd->buffer, CLIENT_BUFFER_SIZE);
                 break;
-            case OP_RESET_DEBUG_LINE_INDEX:
-                packet_len = reset_debug_line_index_pl(cd->buffer, CLIENT_BUFFER_SIZE);
+            case OP_RESET_DEBUG_CURSOR:
+                packet_len = reset_debug_cursor_pl(cd->buffer, CLIENT_BUFFER_SIZE);
                 break;
             case OP_RUN_SEQUENCES:
                 packet_len = run_sequences(cd->buffer, CLIENT_BUFFER_SIZE);
