@@ -143,7 +143,7 @@ size_t reset_debug_cursor_pl(uint8_t *buffer, size_t buffer_size) {
     return create_response(OP_IN_OK, NULL, 0, buffer, buffer_size);
 }
 
-size_t run_sequences(uint8_t *buffer, size_t buffer_size) {
+size_t run_sequences_pl(uint8_t *buffer, size_t buffer_size) {
     // check if device is already in read-only mode
     if (key_seqv_is_read_write())
         return create_response(OP_IN_ERR,

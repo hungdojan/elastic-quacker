@@ -128,7 +128,7 @@ size_t reset_debug_cursor_pl(uint8_t *buffer, size_t buffer_size);
  * @param buffer_size Buffer's max size.
  * @return Number of bytes written.
  */
-size_t run_sequences(uint8_t *buffer, size_t buffer_size);
+size_t run_sequences_pl(uint8_t *buffer, size_t buffer_size);
 
 /**
  * @brief Generate response to a packet with unknown operation code.

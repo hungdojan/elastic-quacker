@@ -86,7 +86,7 @@ static err_t recv_cb(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
                 packet_len = reset_debug_cursor_pl(cd->buffer, CLIENT_BUFFER_SIZE);
                 break;
             case OP_RUN_SEQUENCES:
-                packet_len = run_sequences(cd->buffer, CLIENT_BUFFER_SIZE);
+                packet_len = run_sequences_pl(cd->buffer, CLIENT_BUFFER_SIZE);
                 break;
             default:
                 packet_len = unknown_opcode_pl(cd->buffer, CLIENT_BUFFER_SIZE);
