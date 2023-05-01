@@ -15,6 +15,10 @@
 #include "pico/cyw43_arch.h"
 #include "usb_general.h"
 
+#if DEBUG_CAPS_LOCK
+static bool caps_lock_led_on = false;
+#endif // DEBUG_CAPS_LOCK
+
 // report description for keyboard
 uint8_t const hid_report[] = {
     // TUD_HID_REPORT_DESC_KEYBOARD()
@@ -90,14 +94,17 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id,
     if (report_type != HID_REPORT_TYPE_OUTPUT)
         return;
 
-    // reset key sequence when caps lock is turned off
-    if (!(buffer[0] & KEYBOARD_LED_CAPSLOCK)) {
+    // reset key sequence after the caps lock LED
+    // state changes from on to off
+    if (caps_lock_led_on && !(buffer[0] & KEYBOARD_LED_CAPSLOCK)) {
         key_seqv_reset_index_counter(false);
         if (!get_enable_key_seqv()) {
             set_enable_key_seqv(true);
         }
     }
-#endif
+    caps_lock_led_on = buffer[0] & KEYBOARD_LED_CAPSLOCK;
+
+#endif // DEBUG_CAPS_LOCK
 }
 
 void tud_hid_report_complete_cb(uint8_t instance, uint8_t const *report, uint16_t len) {
