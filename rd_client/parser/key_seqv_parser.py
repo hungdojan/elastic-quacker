@@ -217,7 +217,7 @@ class KeySeqvParser:
             UnknownModifierError: Parser came across unknown modifier.
             UndefinedSpecialKeyNameError: Parser came across unknown special key.
             KeySequenceSizeExceededError: Special sequence of normal keys exceeded max limit.
-            ShiftToggleWithNormalKeyError: Shift modifier cannot be present together with normal key sequence.
+            ShiftToggleWithPrintableKeysError: Shift modifier cannot be present together with normal key sequence.
             ParserError: Any other error related to parsing.
         """
         used_modifiers: list[Modifier] = []
@@ -287,7 +287,7 @@ class KeySeqvParser:
                              'should not contain shift modifier in the script.')
             self._create_log(logging.ERROR,
                              f'Remove "s-" from {match[Groups.SPECIAL_ORIGINAL.value]} on line {line_index+1}')
-            raise ShiftToggleWithNormalKeyError()
+            raise ShiftToggleWithPrintableKeysError()
 
         # get the sequence
         is_shift_toggled, keys_pressed = self._parse_normal_keys_in_special(match, line_index)

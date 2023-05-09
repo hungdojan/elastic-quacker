@@ -35,6 +35,6 @@ class KeySequenceSizeExceededError(ParserError):
     pass
 
 
-class ShiftToggleWithNormalKeyError(ParserError):
+class ShiftToggleWithPrintableKeysError(ParserError):
     """Cannot combine shift modifier in special sequence together with normal keys."""
     pass

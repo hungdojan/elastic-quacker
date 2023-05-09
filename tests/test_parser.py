@@ -3,7 +3,7 @@ import pytest
 
 from rd_client.parser.error import (
         KeySequenceSizeExceededError, NonReadableCharacterError,
-        ShiftToggleWithNormalKeyError, SpecialSequenceShiftToggleError,
+        ShiftToggleWithPrintableKeysError, SpecialSequenceShiftToggleError,
         UndefinedSpecialKeyNameError, UnknownModifierError
 )
 from rd_client.parser.mappings import (
@@ -336,7 +336,7 @@ def test_errors(ksp: KeySeqvParser):
     with pytest.raises(KeySequenceSizeExceededError):
         ksp.parse_line('<a-abcdefg>', 0)
 
-    with pytest.raises(ShiftToggleWithNormalKeyError):
+    with pytest.raises(ShiftToggleWithPrintableKeysError):
         ksp.parse_line('<a-s-a>', 0)
 
 
